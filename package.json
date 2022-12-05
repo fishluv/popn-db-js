@@ -1,0 +1,9 @@
+{
+  "name": "popn-db-js",
+  "version": "0.1.0",
+  "description": "Node client for pop'n sqlite db.",
+  "main": "index.js",
+  "repository": "git@github.com:fishluv/popn-db-js.git",
+  "author": "fishluv <110374653+fishluv@users.noreply.github.com>",
+  "license": "MIT"
+}
