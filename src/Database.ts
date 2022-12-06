@@ -25,8 +25,21 @@ export class Database {
   exec = async (
     sql: string,
     params?: initSqlJs.BindParams,
-  ): Promise<initSqlJs.QueryExecResult[]> => {
+  ): Promise<Record<string, string | null>[]> => {
     await this.init()
-    return this.db!.exec(sql, params)
+    // `result` is [] if no results
+    const result = this.db!.exec(sql, params)[0]
+    if (result) {
+      return this.toRecords(result)
+    } else {
+      return []
+    }
+  }
+
+  private toRecords = (result: initSqlJs.QueryExecResult) => {
+    const [cols, rows] = [result.columns, result.values]
+    return rows.map(vals => {
+      return vals.reduce((ret, v, i) => ({ ...ret, [cols[i]]: v }), {})
+    })
   }
 }

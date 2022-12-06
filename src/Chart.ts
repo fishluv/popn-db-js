@@ -1,16 +1,8 @@
 import { Database } from "./Database"
 import { Difficulty } from "./Difficulty"
 
-interface ChartProps {
-  id: string
-  difficulty: Difficulty
-  level: number
-  has_holds: boolean
-  title: string
-}
-
-const difficultyFromString = (s: string): Difficulty => {
-  const sl = s.toLowerCase()
+const difficultyFromString = (s: string | null): Difficulty => {
+  const sl = s?.toLowerCase()
   switch (sl) {
     case "e":
     case "n":
@@ -28,38 +20,101 @@ const difficultyFromString = (s: string): Difficulty => {
   }
 }
 
+const toNullableNumber = (val: string | null): number | null => {
+  if (val === null) {
+    return null
+  } else {
+    return Number(val)
+  }
+}
+
+interface ChartProps {
+  id: string
+  songId: string
+  difficulty: Difficulty
+  level: number
+  hasHolds: boolean
+  title: string
+  genre: string
+  bpm: string
+  duration: number | null
+  notes: number | null
+  rating: number | null
+  sranLevel: string | null
+}
+
 export class Chart {
   static find = async (id: string): Promise<Chart | null> => {
-    const res = await Database.get.exec(
-      "select id, difficulty, level, has_holds from charts where id = $id limit 1",
-      { $id: id },
-    )
-    if (!res.length) {
+    const query = `
+    select c.id, c.song_id, c.difficulty, c.level, c.has_holds,
+           s.remywiki_title, s.genre_romantrans,
+           h.bpm, h.duration_sec, h.notes, h.rating_num, h.sran_level
+    from charts c
+    join songs s on c.song_id = s.id -- Every chart has a song
+    left join hyrorre_charts h on c.hyrorre_page_path = h.page_path -- but may not have a hyrorre_chart
+    where c.id = $id
+    limit 1
+    `
+    const chartRow = (await Database.get.exec(query, { $id: id }))[0]
+    if (!chartRow) {
       return null
     }
 
-    const chartRow = res[0].values[0]
     return new Chart({
-      id: chartRow[0]!.toString(),
-      difficulty: difficultyFromString(chartRow[1]!.toString()),
-      level: Number(chartRow[2]),
-      has_holds: chartRow[3] === "1",
-      title: "title",
+      id: chartRow["id"]!,
+      songId: chartRow["song_id"]!,
+      difficulty: difficultyFromString(chartRow["difficulty"]),
+      level: Number(chartRow["level"]),
+      hasHolds: chartRow["has_holds"] === "1",
+      title: chartRow["remywiki_title"]!,
+      genre: chartRow["genre_romantrans"]!,
+      bpm: chartRow["bpm"]!,
+      duration: toNullableNumber(chartRow["duration_sec"]),
+      notes: toNullableNumber(chartRow["notes"]),
+      rating: toNullableNumber(chartRow["rating_num"]),
+      sranLevel: chartRow["sran_level"],
     })
   }
 
   readonly id: string
+  readonly songId: string
   readonly difficulty: Difficulty
   readonly level: number
-  readonly has_holds: boolean
+  readonly hasHolds: boolean
   readonly title: string
+  readonly genre: string
+  readonly bpm: string
+  readonly duration: number | null
+  readonly notes: number | null
+  readonly rating: number | null
+  readonly sranLevel: string | null
 
-  constructor({ id, difficulty, level, has_holds, title }: ChartProps) {
+  constructor({
+    id,
+    songId,
+    difficulty,
+    level,
+    hasHolds,
+    title,
+    genre,
+    bpm,
+    duration,
+    notes,
+    rating,
+    sranLevel,
+  }: ChartProps) {
     this.id = id
+    this.songId = songId
     this.difficulty = difficulty
     this.level = level
-    this.has_holds = has_holds
+    this.hasHolds = hasHolds
     this.title = title
+    this.genre = genre
+    this.bpm = bpm
+    this.duration = duration
+    this.notes = notes
+    this.rating = rating
+    this.sranLevel = sranLevel
   }
   //   {"id":"0e"
   // "level":"1"
