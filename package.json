@@ -3,6 +3,10 @@
   "version": "0.2.0",
   "description": "Node client for pop'n sqlite db.",
   "main": "build/src/index.js",
+  "files": [
+    "assets/",
+    "build/"
+  ],
   "repository": "git@github.com:fishluv/popn-db-js.git",
   "author": "fishluv <110374653+fishluv@users.noreply.github.com>",
   "license": "MIT",
