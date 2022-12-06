@@ -1,6 +1,6 @@
 import { readFileSync } from "fs"
+import { resolve } from "path"
 import initSqlJs = require("sql.js")
-import APP_ROOT = require("app-root-path")
 
 export class Database {
   private static instance: Database
@@ -17,7 +17,8 @@ export class Database {
 
   private async init(): Promise<void> {
     const SQL = await initSqlJs()
-    const fileBuffer = readFileSync(`${APP_ROOT}/assets/2022061300.sqlite3`)
+    const filename = resolve(__dirname, "../assets/2022061300.sqlite3")
+    const fileBuffer = readFileSync(filename)
     this.db = new SQL.Database(fileBuffer)
   }
 

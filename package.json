@@ -2,7 +2,7 @@
   "name": "popn-db-js",
   "version": "0.2.1",
   "description": "Node client for pop'n sqlite db.",
-  "main": "build/src/index.js",
+  "main": "build/index.js",
   "files": [
     "assets/",
     "build/"
@@ -26,7 +26,6 @@
     "posttest": "yarn run lint"
   },
   "dependencies": {
-    "app-root-path": "^3.1.0",
     "sql.js": "^1.8.0"
   }
 }
