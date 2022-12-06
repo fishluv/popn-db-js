@@ -1,6 +1,6 @@
 {
   "name": "popn-db-js",
-  "version": "0.2.2",
+  "version": "0.2.3",
   "description": "Node client for pop'n sqlite db.",
   "main": "build/index.js",
   "files": [
