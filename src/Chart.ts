@@ -34,7 +34,7 @@ export class Chart {
       "select id, difficulty, level, has_holds from charts where id = $id limit 1",
       { $id: id },
     )
-    if (!res[0].values) {
+    if (!res.length) {
       return null
     }
 
