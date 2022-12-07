@@ -1,7 +1,7 @@
 import { Difficulty } from "../Difficulty"
 
 // Does not necessary map 1-1 to Chart props.
-export interface ContructorProps {
+interface ChartProps {
   id: string
   songId: string
   difficulty: Difficulty
@@ -20,8 +20,6 @@ export interface ContructorProps {
 }
 
 export default class Chart {
-  // TODO: Need runtime input validation
-
   readonly id: string
   readonly songId: string
   readonly difficulty: Difficulty
@@ -54,7 +52,7 @@ export default class Chart {
     songLabels,
     remyWikiPath,
     hyrorrePath,
-  }: ContructorProps) {
+  }: ChartProps) {
     this.id = id
     this.songId = songId
     this.difficulty = difficulty
@@ -74,6 +72,7 @@ export default class Chart {
         ? null
         : `https://popn.hyrorre.com/%E9%9B%A3%E6%98%93%E5%BA%A6%E8%A1%A8/${hyrorrePath}`
   }
+  // TODO
   // "song__musicdb_title_sort_char":"I"
   // "song__musicdb_genre_sort_char":"ポ"}
 }
