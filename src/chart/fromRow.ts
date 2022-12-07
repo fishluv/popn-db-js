@@ -29,9 +29,9 @@ const toNullableNumber = (val: string | null): number | null => {
   }
 }
 
-const fromRow = async (
+export default async function fromRow(
   chartRow: Record<string, string | null>,
-): Promise<Chart> => {
+): Promise<Chart> {
   const songId = chartRow["song_id"]!
   const songLabels = await Label.forRecord("song", songId)
 
@@ -53,4 +53,3 @@ const fromRow = async (
     hyrorrePath: chartRow["page_path"],
   })
 }
-export default fromRow

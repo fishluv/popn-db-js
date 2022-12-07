@@ -1,10 +1,10 @@
-import { Database } from "../Database"
-import { SranLevel } from "../SranLevel"
-import Chart from "./Chart"
-import fromRow from "./fromRow"
+import { Database } from "../../Database"
+import { SranLevel } from "../../SranLevel"
+import Chart from "../Chart"
+import fromRow from "../fromRow"
 
 export interface SampleProps {
-  count: number
+  count?: number
   levelLowerBound?: number
   levelUpperBound?: number
   excludeFloorInfection?: boolean
@@ -19,7 +19,7 @@ export interface SampleProps {
   excludeLivelyPacks?: boolean
 }
 
-const sample = async ({
+export default async function sample({
   count,
   levelLowerBound = 1,
   levelUpperBound = 50,
@@ -33,7 +33,12 @@ const sample = async ({
   includeEx = true,
   onlyIncludeHardest = false,
   excludeLivelyPacks = false,
-}: SampleProps): Promise<Chart[]> => {
+}: SampleProps = {}): Promise<Chart[]> {
+  if (!count) {
+    console.error("`count` option must be a positive integer")
+    return []
+  }
+
   const query = `
     select c.id, c.song_id, c.difficulty, c.level, c.has_holds,
            s.remywiki_title, s.genre_romantrans, s.remywiki_url_path,
@@ -70,4 +75,3 @@ const sample = async ({
   })
   return await Promise.all(chartRows.map(fromRow))
 }
-export default sample

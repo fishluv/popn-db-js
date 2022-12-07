@@ -1,8 +1,13 @@
-import { Database } from "../Database"
-import Chart from "./Chart"
-import fromRow from "./fromRow"
+import { Database } from "../../Database"
+import Chart from "../Chart"
+import fromRow from "../fromRow"
 
-const find = async (id: string): Promise<Chart | null> => {
+export default async function find(id?: string): Promise<Chart | null> {
+  if (!id) {
+    console.error("Non-empty `id` required")
+    return null
+  }
+
   const query = `
     select c.id, c.song_id, c.difficulty, c.level, c.has_holds,
            s.remywiki_title, s.genre_romantrans, s.remywiki_url_path,
@@ -17,6 +22,6 @@ const find = async (id: string): Promise<Chart | null> => {
   if (!chartRow) {
     return null
   }
+
   return fromRow(chartRow)
 }
-export default find
