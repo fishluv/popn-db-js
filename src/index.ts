@@ -1,6 +1,7 @@
-import { Chart as ChartClass } from "./Chart"
+import find from "./chart/find"
+import sample from "./chart/sample"
 
 export const Chart = {
-  find: ChartClass.find,
-  sample: ChartClass.sample,
+  find,
+  sample,
 }
