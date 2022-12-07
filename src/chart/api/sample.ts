@@ -35,8 +35,20 @@ export default async function sample({
   excludeLivelyPacks = false,
 }: SampleProps = {}): Promise<Chart[]> {
   if (!count) {
-    console.error("`count` option must be a positive integer")
+    console.error("`count` must be a positive integer")
     return []
+  }
+  if (excludeFloorInfection) {
+    console.warn("`excludeFloorInfection` is not supported yet")
+  }
+  if (excludeBuggedBpms) {
+    console.warn("`excludeBuggedBpms` is not supported yet")
+  }
+  if (onlyIncludeHardest) {
+    console.warn("`onlyIncludeHardest` is not supported yet")
+  }
+  if (excludeLivelyPacks) {
+    console.warn("`excludeLivelyPacks` is not supported yet")
   }
 
   const query = `
