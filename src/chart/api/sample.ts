@@ -3,7 +3,7 @@ import { SranLevel } from "../../SranLevel"
 import Chart from "../Chart"
 import fromRow from "../fromRow"
 
-export interface SampleProps {
+export interface SampleOptions {
   count?: number
   levelLowerBound?: number
   levelUpperBound?: number
@@ -33,7 +33,7 @@ export default async function sample({
   includeEx = true,
   onlyIncludeHardest = false,
   excludeLivelyPacks = false,
-}: SampleProps = {}): Promise<Chart[]> {
+}: SampleOptions = {}): Promise<Chart[]> {
   if (!count) {
     console.error("`count` must be a positive integer")
     return []

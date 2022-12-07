@@ -1,4 +1,6 @@
 import { Difficulty } from "../Difficulty"
+import find from "./api/find"
+import sample from "./api/sample"
 
 // Does not necessary map 1-1 to Chart props.
 interface ChartProps {
@@ -20,6 +22,9 @@ interface ChartProps {
 }
 
 export default class Chart {
+  static find = find
+  static sample = sample
+
   readonly id: string
   readonly songId: string
   readonly difficulty: Difficulty
