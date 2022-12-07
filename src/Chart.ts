@@ -1,5 +1,6 @@
 import { Database } from "./Database"
 import { Difficulty } from "./Difficulty"
+import { Label } from "./Label"
 
 const difficultyFromString = (s: string | null): Difficulty => {
   const sl = s?.toLowerCase()
@@ -42,6 +43,7 @@ interface ContructorProps {
   notes: number | null
   rating: number | null
   sranLevel: string | null
+  songLabels: string[]
   remyWikiPath: string
   hyrorrePath: string | null
 }
@@ -63,9 +65,12 @@ export class Chart {
       return null
     }
 
+    const songId = chartRow["song_id"]!
+    const songLabels = await Label.forRecord("song", songId)
+
     return new Chart({
       id: chartRow["id"]!,
-      songId: chartRow["song_id"]!,
+      songId,
       difficulty: difficultyFromString(chartRow["difficulty"]),
       level: Number(chartRow["level"]),
       hasHolds: chartRow["has_holds"] === "1",
@@ -76,6 +81,7 @@ export class Chart {
       notes: toNullableNumber(chartRow["notes"]),
       rating: toNullableNumber(chartRow["rating_num"]),
       sranLevel: chartRow["sran_level"],
+      songLabels,
       remyWikiPath: chartRow["remywiki_url_path"]!,
       hyrorrePath: chartRow["page_path"],
     })
@@ -93,6 +99,7 @@ export class Chart {
   readonly notes: number | null
   readonly rating: number | null
   readonly sranLevel: string | null
+  readonly songLabels: string[]
   readonly remyWikiUrl: string
   readonly hyrorreUrl: string | null
 
@@ -109,6 +116,7 @@ export class Chart {
     notes,
     rating,
     sranLevel,
+    songLabels,
     remyWikiPath,
     hyrorrePath,
   }: ContructorProps) {
@@ -124,13 +132,13 @@ export class Chart {
     this.notes = notes
     this.rating = rating
     this.sranLevel = sranLevel
+    this.songLabels = songLabels
     this.remyWikiUrl = `https://remywiki.com/${remyWikiPath}`
     this.hyrorreUrl =
       hyrorrePath === null
         ? null
         : `https://popn.hyrorre.com/%E9%9B%A3%E6%98%93%E5%BA%A6%E8%A1%A8/${hyrorrePath}`
   }
-  // "song__labels":null
   // "song__musicdb_title_sort_char":"I"
   // "song__musicdb_genre_sort_char":"ポ"}
 }
