@@ -1,6 +1,7 @@
 import { Database } from "./Database"
 import { Difficulty } from "./Difficulty"
 import { Label } from "./Label"
+import { SranLevel } from "./SranLevel"
 
 const difficultyFromString = (s: string | null): Difficulty => {
   const sl = s?.toLowerCase()
@@ -27,6 +28,22 @@ const toNullableNumber = (val: string | null): number | null => {
   } else {
     return Number(val)
   }
+}
+
+export interface SampleProps {
+  count: number
+  levelLowerBound?: number
+  levelUpperBound?: number
+  excludeFloorInfection?: boolean
+  excludeBuggedBpms?: boolean
+  sranLevelLowerBound?: SranLevel
+  sranLevelUpperBound?: SranLevel
+  includeEasy?: boolean
+  includeNormal?: boolean
+  includeHyper?: boolean
+  includeEx?: boolean
+  onlyIncludeHardest?: boolean
+  excludeLivelyPacks?: boolean
 }
 
 // Does not necessary map 1-1 to Chart props.
@@ -64,7 +81,66 @@ export class Chart {
     if (!chartRow) {
       return null
     }
+    return this.fromRow(chartRow)
+  }
 
+  // TODO: Need runtime input validation
+
+  static sample = async ({
+    count,
+    levelLowerBound = 1,
+    levelUpperBound = 50,
+    excludeFloorInfection = false,
+    excludeBuggedBpms = false,
+    sranLevelLowerBound = "01a",
+    sranLevelUpperBound = "19",
+    includeEasy = true,
+    includeNormal = true,
+    includeHyper = true,
+    includeEx = true,
+    onlyIncludeHardest = false,
+    excludeLivelyPacks = false,
+  }: SampleProps): Promise<Chart[]> => {
+    const query = `
+    select c.id, c.song_id, c.difficulty, c.level, c.has_holds,
+           s.remywiki_title, s.genre_romantrans, s.remywiki_url_path,
+           h.bpm, h.duration_sec, h.notes, h.rating_num, h.sran_level, h.page_path
+    from charts c
+    join songs s on c.song_id = s.id -- Every chart has a song
+    left join hyrorre_charts h on c.hyrorre_page_path = h.page_path -- but may not have a hyrorre_chart
+    where c.id in (
+      select c.id
+      from charts c
+      join songs s on c.song_id = s.id -- Every chart has a song
+      left join hyrorre_charts h on c.hyrorre_page_path = h.page_path -- but may not have a hyrorre_chart
+      where true
+      and c.level >= $levelLowerBound
+      and c.level <= $levelUpperBound
+      and coalesce(h.sran_level, '19') >= $sranLevelLowerBound
+      and coalesce(h.sran_level, '01a') <= $sranLevelUpperBound
+      and c.difficulty in ($easy, $normal, $hyper, $ex)
+      order by random()
+      limit $count
+    )
+    `
+
+    const chartRows = await Database.get.exec(query, {
+      $levelLowerBound: levelLowerBound,
+      $levelUpperBound: levelUpperBound,
+      $sranLevelLowerBound: sranLevelLowerBound ?? "01a",
+      $sranLevelUpperBound: sranLevelUpperBound ?? "19",
+      $easy: includeEasy ? "e" : "",
+      $normal: includeNormal ? "n" : "",
+      $hyper: includeHyper ? "h" : "",
+      $ex: includeEx ? "ex" : "",
+      $count: count,
+    })
+    return await Promise.all(chartRows.map(this.fromRow))
+  }
+
+  static fromRow = async (
+    chartRow: Record<string, string | null>,
+  ): Promise<Chart> => {
     const songId = chartRow["song_id"]!
     const songLabels = await Label.forRecord("song", songId)
 
