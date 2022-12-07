@@ -38,6 +38,7 @@ export default async function sample({
     console.error("`count` must be a positive integer")
     return []
   }
+  // TODO
   if (excludeFloorInfection) {
     console.warn("`excludeFloorInfection` is not supported yet")
   }
