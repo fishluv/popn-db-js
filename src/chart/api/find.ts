@@ -2,9 +2,25 @@ import { Database } from "../../Database"
 import Chart from "../Chart"
 import fromRow from "../fromRow"
 
-export default async function find(id?: string): Promise<Chart | null> {
-  if (!id) {
-    console.error("Non-empty `id` required")
+export default async function find(
+  ...ids: string[]
+): Promise<Chart | null | Array<Chart | null>> {
+  if (ids.length === 1) {
+    return await findOne(ids[0])
+  }
+  return await Promise.all(ids.map(findOne))
+}
+
+async function findOne(id: string): Promise<Chart | null> {
+  if (typeof id !== "string") {
+    console.error("`id` must be a string")
+    return null
+  }
+  id = id.toLowerCase()
+  if (!/^\d{1,4}(e|n|h|ex)$/.test(id)) {
+    console.error(
+      "`id` must be a 4-digit number followed by one of: e, n, h, ex",
+    )
     return null
   }
 
