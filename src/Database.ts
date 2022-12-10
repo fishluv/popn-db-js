@@ -16,10 +16,12 @@ export class Database {
   }
 
   private async init(): Promise<void> {
-    const SQL = await initSqlJs()
-    const filename = resolve(__dirname, "../assets/2022061300.sqlite3")
-    const fileBuffer = readFileSync(filename)
-    this.db = new SQL.Database(fileBuffer)
+    if (this.db === null) {
+      const SQL = await initSqlJs()
+      const filename = resolve(__dirname, "../assets/2022061300.sqlite3")
+      const fileBuffer = readFileSync(filename)
+      this.db = new SQL.Database(fileBuffer)
+    }
   }
 
   exec = async (
