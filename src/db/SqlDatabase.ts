@@ -1,0 +1,188 @@
+import { readFileSync } from "fs"
+import { resolve } from "path"
+import initSqlJs = require("sql.js")
+import Chart from "../models/Chart"
+import { parseDifficulty } from "../models/Difficulty"
+import { SampleOptions } from "./Database"
+
+const toNullableNumber = (val: string | null): number | null => {
+  if (val === null) {
+    return null
+  } else {
+    return Number(val)
+  }
+}
+
+export default class SqlDatabase {
+  private static instance = new this()
+
+  static get get() {
+    return this.instance
+  }
+
+  private db: initSqlJs.Database | null = null
+
+  private constructor() {}
+
+  init = async () => {
+    const filename = resolve(__dirname, "../../assets/2022061300.sqlite3")
+    const sqliteBuffer = readFileSync(filename)
+    const SQL = await initSqlJs()
+    this.db = new SQL.Database(sqliteBuffer)
+  }
+
+  findSongLabels = async (songId: string): Promise<string[]> => {
+    const query =
+      "select value from labels where record_type = 'song' and record_id = $songId"
+    const labelRecords = await this.exec(query, {
+      $songId: songId,
+    })
+    return labelRecords.map(row => row["value"]!)
+  }
+
+  findChart = async (id: string): Promise<Chart | null> => {
+    const query = `
+    select c.id, c.song_id, c.difficulty, c.level, c.has_holds,
+           s.remywiki_title, s.genre_romantrans, s.remywiki_url_path,
+           h.bpm, h.duration_sec, h.notes, h.rating_num, h.sran_level, h.page_path
+    from charts c
+    join songs s on c.song_id = s.id -- Every chart has a song
+    left join hyrorre_charts h on c.hyrorre_page_path = h.page_path -- but may not have a hyrorre_chart
+    where c.id = $id
+    limit 1
+    `
+    const chartRow = (await this.exec(query, { $id: id }))[0]
+    if (!chartRow) {
+      return null
+    }
+
+    return this.recordToChart(chartRow)
+  }
+
+  findCharts = async (...ids: string[]): Promise<Array<Chart | null>> => {
+    return await Promise.all(ids.map(this.findChart))
+  }
+
+  sampleCharts = async ({
+    count,
+    levelLowerBound = 1,
+    levelUpperBound = 50,
+    excludeFloorInfection = false,
+    excludeBuggedBpms = false,
+    sranLevelLowerBound = "01a",
+    sranLevelUpperBound = "19",
+    includeEasy = true,
+    includeNormal = true,
+    includeHyper = true,
+    includeEx = true,
+    onlyIncludeHardest = false,
+    excludeLivelyPacks = false,
+  }: SampleOptions = {}): Promise<Chart[]> => {
+    if (!count) {
+      console.error("`count` must be a positive integer")
+      return []
+    }
+    // TODO
+    if (excludeFloorInfection) {
+      console.warn("`excludeFloorInfection` is not supported yet")
+    }
+    if (excludeBuggedBpms) {
+      console.warn("`excludeBuggedBpms` is not supported yet")
+    }
+    if (onlyIncludeHardest) {
+      console.warn("`onlyIncludeHardest` is not supported yet")
+    }
+    if (excludeLivelyPacks) {
+      console.warn("`excludeLivelyPacks` is not supported yet")
+    }
+
+    const query = `
+    select c.id, c.song_id, c.difficulty, c.level, c.has_holds,
+           s.remywiki_title, s.genre_romantrans, s.remywiki_url_path,
+           h.bpm, h.duration_sec, h.notes, h.rating_num, h.sran_level, h.page_path
+    from charts c
+    join songs s on c.song_id = s.id -- Every chart has a song
+    left join hyrorre_charts h on c.hyrorre_page_path = h.page_path -- but may not have a hyrorre_chart
+    where c.id in (
+      select c.id
+      from charts c
+      join songs s on c.song_id = s.id -- Every chart has a song
+      left join hyrorre_charts h on c.hyrorre_page_path = h.page_path -- but may not have a hyrorre_chart
+      where true
+      and c.level >= $levelLowerBound
+      and c.level <= $levelUpperBound
+      and coalesce(h.sran_level, '19') >= $sranLevelLowerBound
+      and coalesce(h.sran_level, '01a') <= $sranLevelUpperBound
+      and c.difficulty in ($easy, $normal, $hyper, $ex)
+      order by random()
+      limit $count
+    )
+    `
+
+    const chartRecords = await this.exec(query, {
+      $levelLowerBound: levelLowerBound,
+      $levelUpperBound: levelUpperBound,
+      $sranLevelLowerBound: sranLevelLowerBound ?? "01a",
+      $sranLevelUpperBound: sranLevelUpperBound ?? "19",
+      $easy: includeEasy ? "e" : "",
+      $normal: includeNormal ? "n" : "",
+      $hyper: includeHyper ? "h" : "",
+      $ex: includeEx ? "ex" : "",
+      $count: count,
+    })
+    return await Promise.all(chartRecords.map(this.recordToChart))
+  }
+
+  private exec = async (
+    sql: string,
+    params?: initSqlJs.BindParams,
+  ): Promise<Record<string, string | null>[]> => {
+    if (this.db === null) {
+      console.error(
+        "db has not been initialized. call `init()` first. returning [].",
+      )
+      return []
+    }
+
+    let records: Record<string, string | null>[] = []
+    try {
+      // `result` is [] if no results
+      const result = this.db.exec(sql, params)[0]
+      if (result) {
+        const [cols, rows] = [result.columns, result.values]
+        records = rows.map(vals => {
+          return vals.reduce((ret, v, i) => ({ ...ret, [cols[i]]: v }), {})
+        })
+      }
+    } catch (e: unknown) {
+      const message = e instanceof Error ? e.message : String(e)
+      console.error(`db call failed: ${message}`)
+    }
+    return records
+  }
+
+  private recordToChart = async (
+    chartRow: Record<string, string | null>,
+  ): Promise<Chart> => {
+    const songId = chartRow["song_id"]!
+    const songLabels = await this.findSongLabels(songId)
+
+    return new Chart({
+      id: chartRow["id"]!,
+      songId,
+      difficulty: parseDifficulty(chartRow["difficulty"]),
+      level: Number(chartRow["level"]),
+      hasHolds: chartRow["has_holds"] === "1",
+      title: chartRow["remywiki_title"]!,
+      genre: chartRow["genre_romantrans"]!,
+      bpm: chartRow["bpm"]!,
+      duration: toNullableNumber(chartRow["duration_sec"]),
+      notes: toNullableNumber(chartRow["notes"]),
+      rating: toNullableNumber(chartRow["rating_num"]),
+      sranLevel: chartRow["sran_level"],
+      songLabels,
+      remyWikiPath: chartRow["remywiki_url_path"]!,
+      hyrorrePath: chartRow["page_path"],
+    })
+  }
+}

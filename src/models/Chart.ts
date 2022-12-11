@@ -1,9 +1,7 @@
-import { Difficulty } from "../Difficulty"
-import find from "./api/find"
-import sample from "./api/sample"
+import Difficulty from "./Difficulty"
 
 // Does not necessary map 1-1 to Chart props.
-interface ChartProps {
+interface ContructorProps {
   id: string
   songId: string
   difficulty: Difficulty
@@ -22,9 +20,6 @@ interface ChartProps {
 }
 
 export default class Chart {
-  static find = find
-  static sample = sample
-
   readonly id: string
   readonly songId: string
   readonly difficulty: Difficulty
@@ -57,7 +52,7 @@ export default class Chart {
     songLabels,
     remyWikiPath,
     hyrorrePath,
-  }: ChartProps) {
+  }: ContructorProps) {
     this.id = id
     this.songId = songId
     this.difficulty = difficulty
