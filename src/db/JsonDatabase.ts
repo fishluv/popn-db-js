@@ -87,13 +87,8 @@ export default class JsonDatabase {
     hardest = "include",
     floorInfection = "include",
     buggedBpms = "include",
-    excludeLivelyPacks = false,
+    livelyPacks = "include",
   }: FilterOptions = {}): Chart[] => {
-    // TODO
-    if (excludeLivelyPacks) {
-      console.warn("`excludeLivelyPacks` is not supported yet")
-    }
-
     // lower and upper both null:     [00, 19] (include charts without sran levels)
     // lower null, upper present:     [01,  u] (do not include charts without sran levels)
     // lower present, upper null:     [ l, 19] (do not include charts without sran levels)
@@ -143,6 +138,7 @@ export default class JsonDatabase {
         ) {
           return false
         }
+
         if (buggedBpms === "exclude" && isBuggedBpm(bpm)) {
           return false
         }
@@ -150,11 +146,24 @@ export default class JsonDatabase {
           return false
         }
 
-        // Put this last because it's expensive.
+        if (
+          livelyPacks === "exclude" &&
+          songLabels.some(label => label.includes("_pack_"))
+        ) {
+          return false
+        }
+        if (
+          livelyPacks === "only" &&
+          !songLabels.some(label => label.includes("_pack_"))
+        ) {
+          return false
+        }
+
         if (
           hardest === "only" &&
           !isHardestDifficultyForSong(difficulty, songId)
         ) {
+          // Put this last because it's expensive.
           return false
         }
 

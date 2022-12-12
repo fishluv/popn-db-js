@@ -14,7 +14,7 @@ export interface FilterOptions {
   hardest?: IncludeOption
   floorInfection?: IncludeOption
   buggedBpms?: IncludeOption
-  excludeLivelyPacks?: boolean
+  livelyPacks?: IncludeOption
 }
 
 export type SampleOptions = FilterOptions & { count?: number }

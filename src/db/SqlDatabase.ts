@@ -67,7 +67,7 @@ export default class SqlDatabase {
     hardest = "include",
     floorInfection = "include",
     buggedBpms = "include",
-    excludeLivelyPacks = false,
+    livelyPacks = "include",
   }: SampleOptions = {}): Promise<Chart[]> => {
     if (!count) {
       console.error("`count` must be a positive integer")
@@ -83,8 +83,8 @@ export default class SqlDatabase {
     if (buggedBpms) {
       console.warn("`buggedBpms` is not supported yet")
     }
-    if (excludeLivelyPacks) {
-      console.warn("`excludeLivelyPacks` is not supported yet")
+    if (livelyPacks) {
+      console.warn("`livelyPacks` is not supported yet")
     }
 
     const query = `
