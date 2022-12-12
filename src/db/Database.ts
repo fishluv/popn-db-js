@@ -5,6 +5,8 @@ export type IncludeOption = "include" | "exclude" | "only"
 export interface FilterOptions {
   levelMin?: number
   levelMax?: number
+  ratingMin?: number
+  ratingMax?: number
   sranLevelMin?: SranLevel
   sranLevelMax?: SranLevel
   includeEasy?: boolean
