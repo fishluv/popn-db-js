@@ -31,15 +31,6 @@ export default class SqlDatabase {
     this.db = new SQL.Database(sqliteBuffer)
   }
 
-  findSongLabels = async (songId: string): Promise<string[]> => {
-    const query =
-      "select value from labels where record_type = 'song' and record_id = $songId"
-    const labelRecords = await this.exec(query, {
-      $songId: songId,
-    })
-    return labelRecords.map(row => row["value"]!)
-  }
-
   findChart = async (id: string): Promise<Chart | null> => {
     const query = `
     select c.id, c.song_id, c.difficulty, c.level, c.has_holds,
@@ -172,7 +163,7 @@ export default class SqlDatabase {
       songId,
       difficulty: parseDifficulty(chartRow["difficulty"]),
       level: Number(chartRow["level"]),
-      hasHolds: chartRow["has_holds"] === "1",
+      hasHolds: Number(chartRow["has_holds"]) === 1,
       title: chartRow["remywiki_title"]!,
       genre: chartRow["genre_romantrans"]!,
       bpm: chartRow["bpm"]!,
@@ -184,5 +175,14 @@ export default class SqlDatabase {
       remyWikiPath: chartRow["remywiki_url_path"]!,
       hyrorrePath: chartRow["page_path"],
     })
+  }
+
+  private findSongLabels = async (songId: string): Promise<string[]> => {
+    const query =
+      "select value from labels where record_type = 'song' and record_id = $songId"
+    const labelRecords = await this.exec(query, {
+      $songId: songId,
+    })
+    return labelRecords.map(row => row["value"]!)
   }
 }
