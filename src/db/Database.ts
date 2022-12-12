@@ -1,10 +1,12 @@
 import SranLevel from "../models/SranLevel"
 
+export type IncludeOption = "include" | "exclude" | "only"
+
 export interface FilterOptions {
   levelMin?: number
   levelMax?: number
-  excludeFloorInfection?: boolean
-  excludeBuggedBpms?: boolean
+  floorInfection?: IncludeOption
+  buggedBpms?: IncludeOption
   sranLevelMin?: SranLevel
   sranLevelMax?: SranLevel
   includeEasy?: boolean

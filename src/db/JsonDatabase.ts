@@ -78,8 +78,8 @@ export default class JsonDatabase {
   filterCharts = ({
     levelMin = 1,
     levelMax = 50,
-    excludeFloorInfection = false,
-    excludeBuggedBpms = false,
+    floorInfection = "include",
+    buggedBpms = "include",
     sranLevelMin = null,
     sranLevelMax = null,
     includeEasy = true,
@@ -110,10 +110,22 @@ export default class JsonDatabase {
           return false
         }
 
-        if (excludeFloorInfection && songLabels.includes("floor_infection")) {
+        if (
+          floorInfection === "exclude" &&
+          songLabels.includes("floor_infection")
+        ) {
           return false
         }
-        if (excludeBuggedBpms && isBuggedBpm(bpm)) {
+        if (
+          floorInfection === "only" &&
+          !songLabels.includes("floor_infection")
+        ) {
+          return false
+        }
+        if (buggedBpms === "exclude" && isBuggedBpm(bpm)) {
+          return false
+        }
+        if (buggedBpms === "only" && !isBuggedBpm(bpm)) {
           return false
         }
 

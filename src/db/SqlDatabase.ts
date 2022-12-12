@@ -58,8 +58,8 @@ export default class SqlDatabase {
     count,
     levelMin = 1,
     levelMax = 50,
-    excludeFloorInfection = false,
-    excludeBuggedBpms = false,
+    floorInfection = "include",
+    buggedBpms = "include",
     sranLevelMin = "01a",
     sranLevelMax = "19",
     includeEasy = true,
@@ -74,11 +74,11 @@ export default class SqlDatabase {
       return []
     }
     // TODO
-    if (excludeFloorInfection) {
-      console.warn("`excludeFloorInfection` is not supported yet")
+    if (floorInfection) {
+      console.warn("`floorInfection` is not supported yet")
     }
-    if (excludeBuggedBpms) {
-      console.warn("`excludeBuggedBpms` is not supported yet")
+    if (buggedBpms) {
+      console.warn("`buggedBpms` is not supported yet")
     }
     if (onlyIncludeHardest) {
       console.warn("`onlyIncludeHardest` is not supported yet")
