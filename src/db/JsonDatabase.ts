@@ -1,5 +1,19 @@
-import Chart from "../models/Chart"
 import { SampleOptions } from "./Database"
+import Chart from "../models/Chart"
+import { parseDifficulty } from "../models/Difficulty"
+
+const allCharts: Array<
+  Record<string, string | string[] | null>
+> = require("../../assets/2022061300.json")
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const toNullableNumber = (val: any): number | null => {
+  if (val === null) {
+    return null
+  } else {
+    return Number(val)
+  }
+}
 
 export default class JsonDatabase {
   private static instance = new this()
@@ -10,12 +24,12 @@ export default class JsonDatabase {
 
   private constructor() {}
 
-  findSongLabels = (songId: string): string[] => {
-    return []
-  }
-
   findChart = (id: string): Chart | null => {
-    return null
+    const chartRecord = allCharts.find(c => c.id === id)
+    if (!chartRecord) {
+      return null
+    }
+    return this.recordToChart(chartRecord)
   }
 
   findCharts = (...ids: string[]): Array<Chart | null> => {
@@ -56,5 +70,25 @@ export default class JsonDatabase {
     }
 
     return []
+  }
+
+  private recordToChart = (chartRec: typeof allCharts[number]): Chart => {
+    return new Chart({
+      id: chartRec["id"] as string,
+      songId: chartRec["song_id"] as string,
+      difficulty: parseDifficulty(chartRec["difficulty"] as string),
+      level: Number(chartRec["level"]),
+      hasHolds: Number(chartRec["has_holds"]) === 1,
+      title: chartRec["title"] as string,
+      genre: chartRec["genre"] as string,
+      bpm: chartRec["bpm"] as string,
+      duration: toNullableNumber(chartRec["duration"]),
+      notes: toNullableNumber(chartRec["notes"]),
+      rating: toNullableNumber(chartRec["rating"]),
+      sranLevel: chartRec["sran_level"] as string,
+      songLabels: chartRec["song_labels"] as string[],
+      remyWikiPath: chartRec["remywiki_path"] as string,
+      hyrorrePath: chartRec["hyrorre_path"] as string,
+    })
   }
 }
