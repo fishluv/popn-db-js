@@ -1,12 +1,12 @@
 import SranLevel from "../models/SranLevel"
 
 export interface FilterOptions {
-  levelLowerBound?: number
-  levelUpperBound?: number
+  levelMin?: number
+  levelMax?: number
   excludeFloorInfection?: boolean
   excludeBuggedBpms?: boolean
-  sranLevelLowerBound?: SranLevel
-  sranLevelUpperBound?: SranLevel
+  sranLevelMin?: SranLevel
+  sranLevelMax?: SranLevel
   includeEasy?: boolean
   includeNormal?: boolean
   includeHyper?: boolean

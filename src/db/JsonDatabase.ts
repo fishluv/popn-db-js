@@ -76,12 +76,12 @@ export default class JsonDatabase {
   }
 
   filterCharts = ({
-    levelLowerBound = 1,
-    levelUpperBound = 50,
+    levelMin = 1,
+    levelMax = 50,
     excludeFloorInfection = false,
     excludeBuggedBpms = false,
-    sranLevelLowerBound = null,
-    sranLevelUpperBound = null,
+    sranLevelMin = null,
+    sranLevelMax = null,
     includeEasy = true,
     includeNormal = true,
     includeHyper = true,
@@ -98,16 +98,15 @@ export default class JsonDatabase {
     // lower null, upper present:     [01,  u] (do not include charts without sran levels)
     // lower present, upper null:     [ l, 19] (do not include charts without sran levels)
     // lower and upper both present:  [ l,  u] (do not include charts without sran levels)
-    const normSranLower =
-      sranLevelLowerBound ?? (sranLevelUpperBound === null ? "00" : "01")
-    const normSranUpper = sranLevelUpperBound ?? "19"
+    const normSranLower = sranLevelMin ?? (sranLevelMax === null ? "00" : "01")
+    const normSranUpper = sranLevelMax ?? "19"
 
     const filtered = allCharts.filter(
       ({ songId, difficulty, level, bpm, sranLevel, songLabels }) => {
-        if (level < levelLowerBound) {
+        if (level < levelMin) {
           return false
         }
-        if (level > levelUpperBound) {
+        if (level > levelMax) {
           return false
         }
 

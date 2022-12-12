@@ -56,12 +56,12 @@ export default class SqlDatabase {
 
   sampleCharts = async ({
     count,
-    levelLowerBound = 1,
-    levelUpperBound = 50,
+    levelMin = 1,
+    levelMax = 50,
     excludeFloorInfection = false,
     excludeBuggedBpms = false,
-    sranLevelLowerBound = "01a",
-    sranLevelUpperBound = "19",
+    sranLevelMin = "01a",
+    sranLevelMax = "19",
     includeEasy = true,
     includeNormal = true,
     includeHyper = true,
@@ -100,10 +100,10 @@ export default class SqlDatabase {
       join songs s on c.song_id = s.id -- Every chart has a song
       left join hyrorre_charts h on c.hyrorre_page_path = h.page_path -- but may not have a hyrorre_chart
       where true
-      and c.level >= $levelLowerBound
-      and c.level <= $levelUpperBound
-      and coalesce(h.sran_level, '19') >= $sranLevelLowerBound
-      and coalesce(h.sran_level, '01a') <= $sranLevelUpperBound
+      and c.level >= $levelMin
+      and c.level <= $levelMax
+      and coalesce(h.sran_level, '19') >= $sranLevelMin
+      and coalesce(h.sran_level, '01a') <= $sranLevelMax
       and c.difficulty in ($easy, $normal, $hyper, $ex)
       order by random()
       limit $count
@@ -111,10 +111,10 @@ export default class SqlDatabase {
     `
 
     const chartRecords = await this.exec(query, {
-      $levelLowerBound: levelLowerBound,
-      $levelUpperBound: levelUpperBound,
-      $sranLevelLowerBound: sranLevelLowerBound ?? "01a",
-      $sranLevelUpperBound: sranLevelUpperBound ?? "19",
+      $levelMin: levelMin,
+      $levelMax: levelMax,
+      $sranLevelMin: sranLevelMin ?? "01a",
+      $sranLevelMax: sranLevelMax ?? "19",
       $easy: includeEasy ? "e" : "",
       $normal: includeNormal ? "n" : "",
       $hyper: includeHyper ? "h" : "",
