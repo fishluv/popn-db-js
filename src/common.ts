@@ -1,3 +1,7 @@
 export * from "./models"
 
-export { SampleOptions as ChartSampleOptions } from "./db/Database"
+export {
+  IncludeOption,
+  FilterOptions as ChartFilterOptions,
+  SampleOptions as ChartSampleOptions,
+} from "./db/Database"
