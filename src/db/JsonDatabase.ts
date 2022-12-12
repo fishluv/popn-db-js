@@ -13,6 +13,12 @@ function toNullableNumber(val: any): number | null {
   }
 }
 
+function isNotBlank(
+  x: boolean | number | string | null | undefined,
+): x is boolean | number | string {
+  return x !== null && x !== undefined && x !== ""
+}
+
 function isBuggedBpm(bpmStr: string | null): boolean {
   if (bpmStr === null) {
     return false
@@ -91,22 +97,15 @@ export default class JsonDatabase {
     buggedBpms = "include",
     livelyPacks = "include",
   }: FilterOptions = {}): Chart[] => {
-    // Normalize rating options.
-    // For simplicity, charts without ratings have a dummy rating of -3.
-    // min and max both blank:    [ -3,   2] (include charts without ratings)
-    // min blank, max present:    [ -2, max] (do not include charts without ratings)
-    // min present, max blank:    [min,   2] (do not include charts without ratings)
-    // min and max both present:  [min, max] (do not include charts without ratings)
-    const normRatingMin = ratingMin ?? (!ratingMax && ratingMax !== 0 ? -3 : -2)
+    // Only filter by rating if ratingMin or ratingMax is present.
+    const shouldFilterRating = isNotBlank(ratingMin) || isNotBlank(ratingMax)
+    const normRatingMin = ratingMin ?? -2
     const normRatingMax = ratingMax ?? 2
 
-    // Normalize sran level options.
-    // For simplicity, charts without sran levels have a dummy sran level of "00".
-    // min and max both blank:    [00, 19] (include charts without sran levels)
-    // min blank, max present:    [01,  u] (do not include charts without sran levels)
-    // min present, max blank:    [ l, 19] (do not include charts without sran levels)
-    // min and max both present:  [ l,  u] (do not include charts without sran levels)
-    const normSranMin = sranLevelMin ?? (!sranLevelMax ? "00" : "01")
+    // Only filter by sran level if sranLevelMin or sranLevelMax is present.
+    const shouldFilterSranLevel =
+      isNotBlank(sranLevelMin) || isNotBlank(sranLevelMax)
+    const normSranMin = sranLevelMin ?? "01"
     const normSranMax = sranLevelMax ?? "19"
 
     const filtered = allCharts.filter(
@@ -118,20 +117,28 @@ export default class JsonDatabase {
           return false
         }
 
-        const normRating = rating ?? -3
-        if (normRating < normRatingMin) {
-          return false
-        }
-        if (normRating > normRatingMax) {
-          return false
+        if (shouldFilterRating) {
+          if (!isNotBlank(rating)) {
+            return false
+          }
+          if (rating < normRatingMin) {
+            return false
+          }
+          if (rating > normRatingMax) {
+            return false
+          }
         }
 
-        const normSranLevel = sranLevel ?? "00"
-        if (normSranLevel < normSranMin) {
-          return false
-        }
-        if (normSranLevel > normSranMax) {
-          return false
+        if (shouldFilterSranLevel) {
+          if (!isNotBlank(sranLevel)) {
+            return false
+          }
+          if (sranLevel < normSranMin) {
+            return false
+          }
+          if (sranLevel > normSranMax) {
+            return false
+          }
         }
 
         if (!includeEasy && difficulty === "e") {
