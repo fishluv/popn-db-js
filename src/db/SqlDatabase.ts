@@ -13,6 +13,12 @@ const toNullableNumber = (val: string | null): number | null => {
   }
 }
 
+function isNotBlank(
+  x: boolean | number | string | null | undefined,
+): x is boolean | number | string {
+  return x !== null && x !== undefined && x !== ""
+}
+
 export default class SqlDatabase {
   private static instance = new this()
 
@@ -58,8 +64,10 @@ export default class SqlDatabase {
     count,
     levelMin = 1,
     levelMax = 50,
-    sranLevelMin = "01a",
-    sranLevelMax = "19",
+    ratingMin = undefined,
+    ratingMax = undefined,
+    sranLevelMin = undefined,
+    sranLevelMax = undefined,
     includeEasy = true,
     includeNormal = true,
     includeHyper = true,
@@ -87,6 +95,17 @@ export default class SqlDatabase {
       console.warn("`livelyPacks` is not supported yet")
     }
 
+    // Only filter by rating if ratingMin or ratingMax is present.
+    const shouldFilterRating = isNotBlank(ratingMin) || isNotBlank(ratingMax)
+    const normRatingMin = ratingMin ?? -2
+    const normRatingMax = ratingMax ?? 2
+
+    // Only filter by sran level if sranLevelMin or sranLevelMax is present.
+    const shouldFilterSranLevel =
+      isNotBlank(sranLevelMin) || isNotBlank(sranLevelMax)
+    const normSranMin = sranLevelMin ?? "01"
+    const normSranMax = sranLevelMax ?? "19"
+
     const query = `
     select c.id, c.song_id, c.difficulty, c.level, c.has_holds,
            s.remywiki_title, s.genre_romantrans, s.remywiki_url_path,
@@ -102,8 +121,8 @@ export default class SqlDatabase {
       where true
       and c.level >= $levelMin
       and c.level <= $levelMax
-      and coalesce(h.sran_level, '19') >= $sranLevelMin
-      and coalesce(h.sran_level, '01a') <= $sranLevelMax
+      and ($shouldFilterRating = 0 or (h.rating_num is not null and h.rating_num >= $ratingMin and h.rating_num <= $ratingMax))
+      and ($shouldFilterSranLevel = 0 or (h.sran_level is not null and h.sran_level >= $sranLevelMin and h.sran_level <= $sranLevelMax))
       and c.difficulty in ($easy, $normal, $hyper, $ex)
       order by random()
       limit $count
@@ -113,8 +132,12 @@ export default class SqlDatabase {
     const chartRecords = await this.exec(query, {
       $levelMin: levelMin,
       $levelMax: levelMax,
-      $sranLevelMin: sranLevelMin ?? "01a",
-      $sranLevelMax: sranLevelMax ?? "19",
+      $shouldFilterRating: shouldFilterRating ? 1 : 0,
+      $ratingMin: normRatingMin,
+      $ratingMax: normRatingMax,
+      $shouldFilterSranLevel: shouldFilterSranLevel ? 1 : 0,
+      $sranLevelMin: normSranMin,
+      $sranLevelMax: normSranMax,
       $easy: includeEasy ? "e" : "",
       $normal: includeNormal ? "n" : "",
       $hyper: includeHyper ? "h" : "",
