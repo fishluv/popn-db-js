@@ -66,7 +66,7 @@ export default class SqlDatabase {
     includeNormal = true,
     includeHyper = true,
     includeEx = true,
-    onlyIncludeHardest = false,
+    hardest = "include",
     excludeLivelyPacks = false,
   }: SampleOptions = {}): Promise<Chart[]> => {
     if (!count) {
@@ -80,8 +80,8 @@ export default class SqlDatabase {
     if (buggedBpms) {
       console.warn("`buggedBpms` is not supported yet")
     }
-    if (onlyIncludeHardest) {
-      console.warn("`onlyIncludeHardest` is not supported yet")
+    if (hardest) {
+      console.warn("`hardest` is not supported yet")
     }
     if (excludeLivelyPacks) {
       console.warn("`excludeLivelyPacks` is not supported yet")

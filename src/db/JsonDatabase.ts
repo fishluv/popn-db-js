@@ -86,7 +86,7 @@ export default class JsonDatabase {
     includeNormal = true,
     includeHyper = true,
     includeEx = true,
-    onlyIncludeHardest = false,
+    hardest = "include",
     excludeLivelyPacks = false,
   }: FilterOptions = {}): Chart[] => {
     // TODO
@@ -152,7 +152,7 @@ export default class JsonDatabase {
 
         // Put this last because it's expensive.
         if (
-          onlyIncludeHardest &&
+          hardest === "only" &&
           !isHardestDifficultyForSong(difficulty, songId)
         ) {
           return false

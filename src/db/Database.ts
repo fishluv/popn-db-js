@@ -13,7 +13,7 @@ export interface FilterOptions {
   includeNormal?: boolean
   includeHyper?: boolean
   includeEx?: boolean
-  onlyIncludeHardest?: boolean
+  hardest?: IncludeOption
   excludeLivelyPacks?: boolean
 }
 
