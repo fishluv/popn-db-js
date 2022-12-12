@@ -22,7 +22,7 @@ export const SRAN_LEVELS = [
   "19",
 ] as const
 
-type SranLevel = typeof SRAN_LEVELS[number]
+type SranLevel = typeof SRAN_LEVELS[number] | null
 export default SranLevel
 
 export function parseSranLevel(s: string): SranLevel {

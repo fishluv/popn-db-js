@@ -1,7 +1,7 @@
 import Difficulty from "./Difficulty"
 
 // Does not necessary map 1-1 to Chart props.
-interface ContructorProps {
+export interface ChartConstructorProps {
   id: string
   songId: string
   difficulty: Difficulty
@@ -9,7 +9,7 @@ interface ContructorProps {
   hasHolds: boolean
   title: string
   genre: string
-  bpm: string
+  bpm: string | null
   duration: number | null
   notes: number | null
   rating: number | null
@@ -27,7 +27,7 @@ export default class Chart {
   readonly hasHolds: boolean
   readonly title: string
   readonly genre: string
-  readonly bpm: string
+  readonly bpm: string | null
   readonly duration: number | null
   readonly notes: number | null
   readonly rating: number | null
@@ -52,7 +52,7 @@ export default class Chart {
     songLabels,
     remyWikiPath,
     hyrorrePath,
-  }: ContructorProps) {
+  }: ChartConstructorProps) {
     this.id = id
     this.songId = songId
     this.difficulty = difficulty

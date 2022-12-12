@@ -1,7 +1,6 @@
 import SranLevel from "../models/SranLevel"
 
-export interface SampleOptions {
-  count?: number
+export interface FilterOptions {
   levelLowerBound?: number
   levelUpperBound?: number
   excludeFloorInfection?: boolean
@@ -15,3 +14,5 @@ export interface SampleOptions {
   onlyIncludeHardest?: boolean
   excludeLivelyPacks?: boolean
 }
+
+export type SampleOptions = FilterOptions & { count?: number }
