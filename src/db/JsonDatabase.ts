@@ -78,8 +78,6 @@ export default class JsonDatabase {
   filterCharts = ({
     levelMin = 1,
     levelMax = 50,
-    floorInfection = "include",
-    buggedBpms = "include",
     sranLevelMin = null,
     sranLevelMax = null,
     includeEasy = true,
@@ -87,6 +85,8 @@ export default class JsonDatabase {
     includeHyper = true,
     includeEx = true,
     hardest = "include",
+    floorInfection = "include",
+    buggedBpms = "include",
     excludeLivelyPacks = false,
   }: FilterOptions = {}): Chart[] => {
     // TODO
@@ -110,25 +110,6 @@ export default class JsonDatabase {
           return false
         }
 
-        if (
-          floorInfection === "exclude" &&
-          songLabels.includes("floor_infection")
-        ) {
-          return false
-        }
-        if (
-          floorInfection === "only" &&
-          !songLabels.includes("floor_infection")
-        ) {
-          return false
-        }
-        if (buggedBpms === "exclude" && isBuggedBpm(bpm)) {
-          return false
-        }
-        if (buggedBpms === "only" && !isBuggedBpm(bpm)) {
-          return false
-        }
-
         const normSranLevel = sranLevel ?? "00"
         if (normSranLevel < normSranLower) {
           return false
@@ -147,6 +128,25 @@ export default class JsonDatabase {
           return false
         }
         if (!includeEx && difficulty === "ex") {
+          return false
+        }
+
+        if (
+          floorInfection === "exclude" &&
+          songLabels.includes("floor_infection")
+        ) {
+          return false
+        }
+        if (
+          floorInfection === "only" &&
+          !songLabels.includes("floor_infection")
+        ) {
+          return false
+        }
+        if (buggedBpms === "exclude" && isBuggedBpm(bpm)) {
+          return false
+        }
+        if (buggedBpms === "only" && !isBuggedBpm(bpm)) {
           return false
         }
 

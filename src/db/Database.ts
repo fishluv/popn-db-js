@@ -5,8 +5,6 @@ export type IncludeOption = "include" | "exclude" | "only"
 export interface FilterOptions {
   levelMin?: number
   levelMax?: number
-  floorInfection?: IncludeOption
-  buggedBpms?: IncludeOption
   sranLevelMin?: SranLevel
   sranLevelMax?: SranLevel
   includeEasy?: boolean
@@ -14,6 +12,8 @@ export interface FilterOptions {
   includeHyper?: boolean
   includeEx?: boolean
   hardest?: IncludeOption
+  floorInfection?: IncludeOption
+  buggedBpms?: IncludeOption
   excludeLivelyPacks?: boolean
 }
 

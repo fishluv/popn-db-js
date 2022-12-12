@@ -58,8 +58,6 @@ export default class SqlDatabase {
     count,
     levelMin = 1,
     levelMax = 50,
-    floorInfection = "include",
-    buggedBpms = "include",
     sranLevelMin = "01a",
     sranLevelMax = "19",
     includeEasy = true,
@@ -67,6 +65,8 @@ export default class SqlDatabase {
     includeHyper = true,
     includeEx = true,
     hardest = "include",
+    floorInfection = "include",
+    buggedBpms = "include",
     excludeLivelyPacks = false,
   }: SampleOptions = {}): Promise<Chart[]> => {
     if (!count) {
@@ -74,14 +74,14 @@ export default class SqlDatabase {
       return []
     }
     // TODO
+    if (hardest) {
+      console.warn("`hardest` is not supported yet")
+    }
     if (floorInfection) {
       console.warn("`floorInfection` is not supported yet")
     }
     if (buggedBpms) {
       console.warn("`buggedBpms` is not supported yet")
-    }
-    if (hardest) {
-      console.warn("`hardest` is not supported yet")
     }
     if (excludeLivelyPacks) {
       console.warn("`excludeLivelyPacks` is not supported yet")
