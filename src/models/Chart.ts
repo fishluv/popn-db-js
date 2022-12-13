@@ -4,6 +4,7 @@ import Difficulty from "./Difficulty"
 export interface ChartConstructorProps {
   id: string
   songId: string
+  songFolder: string
   difficulty: Difficulty
   level: number
   hasHolds: boolean
@@ -22,6 +23,7 @@ export interface ChartConstructorProps {
 export default class Chart {
   readonly id: string
   readonly songId: string
+  readonly songFolder: string
   readonly difficulty: Difficulty
   readonly level: number
   readonly hasHolds: boolean
@@ -39,6 +41,7 @@ export default class Chart {
   constructor({
     id,
     songId,
+    songFolder,
     difficulty,
     level,
     hasHolds,
@@ -55,6 +58,7 @@ export default class Chart {
   }: ChartConstructorProps) {
     this.id = id
     this.songId = songId
+    this.songFolder = songFolder
     this.difficulty = difficulty
     this.level = level
     this.hasHolds = hasHolds

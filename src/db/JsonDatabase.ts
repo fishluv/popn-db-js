@@ -217,6 +217,7 @@ export default class JsonDatabase {
     return new Chart({
       id: chartRec["id"] as string,
       songId: chartRec["songId"] as string,
+      songFolder: chartRec["songFolder"] as string,
       difficulty: parseDifficulty(chartRec["difficulty"] as string),
       level: Number(chartRec["level"]),
       hasHolds: chartRec["hasHolds"] as boolean,

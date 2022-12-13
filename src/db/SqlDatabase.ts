@@ -40,7 +40,7 @@ export default class SqlDatabase {
   findChart = async (id: string): Promise<Chart | null> => {
     const query = `
     select c.id, c.song_id, c.difficulty, c.level, c.has_holds,
-           s.remywiki_title, s.genre_romantrans, s.remywiki_url_path,
+           s.folder, s.remywiki_title, s.genre_romantrans, s.remywiki_url_path,
            h.bpm, h.duration_sec, h.notes, h.rating_num, h.sran_level, h.page_path
     from charts c
     join songs s on c.song_id = s.id -- Every chart has a song
@@ -108,7 +108,7 @@ export default class SqlDatabase {
 
     const query = `
     select c.id, c.song_id, c.difficulty, c.level, c.has_holds,
-           s.remywiki_title, s.genre_romantrans, s.remywiki_url_path,
+           s.folder, s.remywiki_title, s.genre_romantrans, s.remywiki_url_path,
            h.bpm, h.duration_sec, h.notes, h.rating_num, h.sran_level, h.page_path
     from charts c
     join songs s on c.song_id = s.id -- Every chart has a song
@@ -184,6 +184,7 @@ export default class SqlDatabase {
     return new Chart({
       id: chartRow["id"]!,
       songId,
+      songFolder: chartRow["folder"]!,
       difficulty: parseDifficulty(chartRow["difficulty"]),
       level: Number(chartRow["level"]),
       hasHolds: Number(chartRow["has_holds"]) === 1,
