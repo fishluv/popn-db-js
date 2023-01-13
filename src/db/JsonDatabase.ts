@@ -223,6 +223,8 @@ export default class JsonDatabase {
       hasHolds: chartRec["hasHolds"] as boolean,
       title: chartRec["title"] as string,
       genre: chartRec["genre"] as string,
+      titleSortChar: chartRec["titleSortChar"] as string,
+      genreSortChar: chartRec["genreSortChar"] as string,
       bpm: chartRec["bpm"] as string,
       duration: toNullableNumber(chartRec["duration"]),
       notes: toNullableNumber(chartRec["notes"]),

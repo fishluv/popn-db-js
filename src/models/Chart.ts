@@ -10,6 +10,8 @@ export interface ChartConstructorProps {
   hasHolds: boolean
   title: string
   genre: string
+  titleSortChar: string
+  genreSortChar: string
   bpm: string | null
   duration: number | null
   notes: number | null
@@ -29,6 +31,8 @@ export default class Chart {
   readonly hasHolds: boolean
   readonly title: string
   readonly genre: string
+  readonly titleSortChar: string
+  readonly genreSortChar: string
   readonly bpm: string | null
   readonly duration: number | null
   readonly notes: number | null
@@ -47,6 +51,8 @@ export default class Chart {
     hasHolds,
     title,
     genre,
+    titleSortChar,
+    genreSortChar,
     bpm,
     duration,
     notes,
@@ -64,6 +70,8 @@ export default class Chart {
     this.hasHolds = hasHolds
     this.title = title
     this.genre = genre
+    this.titleSortChar = titleSortChar
+    this.genreSortChar = genreSortChar
     this.bpm = bpm
     this.duration = duration
     this.notes = notes
@@ -76,7 +84,4 @@ export default class Chart {
         ? null
         : `https://popn.hyrorre.com/%E9%9B%A3%E6%98%93%E5%BA%A6%E8%A1%A8/${hyrorrePath}`
   }
-  // TODO
-  // "song__musicdb_title_sort_char":"I"
-  // "song__musicdb_genre_sort_char":"ポ"}
 }
