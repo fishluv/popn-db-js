@@ -1,6 +1,7 @@
 import { FilterOptions, SampleOptions } from "./Database"
 import Chart, { ChartConstructorProps } from "../models/Chart"
 import Difficulty, { parseDifficulty } from "../models/Difficulty"
+import ConditionSet from "./ConditionSet"
 
 const allCharts: Array<ChartConstructorProps> = require("../../assets/2022061300.json")
 
@@ -211,6 +212,51 @@ export default class JsonDatabase {
 
     const filtered = this.filterCharts(filterOptions)
     return sampleArray(filtered, count)
+  }
+
+  queryCharts = (query = ""): Chart[] => {
+    /*
+        levelMin = 1,
+    levelMax = 50,
+    ratingMin = undefined,
+    ratingMax = undefined,
+    sranLevelMin = undefined,
+    sranLevelMax = undefined,
+    includeEasy = true,
+    includeNormal = true,
+    includeHyper = true,
+    includeEx = true,
+    hardest = "include",
+    floorInfection = "include",
+    buggedBpms = "include",
+    livelyPacks = "include",
+    */
+    // number condition (level, rating)
+    // number-like condition (sran level)
+    // enum condition (diff)
+    // bool condition (hardest, floor infection, bpm)
+    const conditionSet = ConditionSet.fromQuery(query)
+    const matchingRecords = allCharts.filter(chart =>
+      conditionSet.isSatisfiedByChart(chart),
+    )
+    return matchingRecords.map(this.recordToChart)
+  }
+
+  sampleQueriedCharts = ({
+    count,
+    query,
+  }: { count?: number; query?: string } = {}): Chart[] => {
+    if (!(count && count > 0)) {
+      console.error("`count` must be a positive integer")
+      return []
+    }
+    if (!query) {
+      console.error("`query` must be a nonempty string")
+      return []
+    }
+
+    const queried = this.queryCharts(query)
+    return sampleArray(queried, count)
   }
 
   private recordToChart = (chartRec: typeof allCharts[number]): Chart => {
