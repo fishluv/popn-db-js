@@ -1,10 +1,8 @@
 export * from "./models"
 
 export {
+  default as Database,
   IncludeOption,
   FilterOptions as ChartFilterOptions,
   SampleOptions as ChartSampleOptions,
-} from "./db/JsonDatabase"
-
-import JsonDatabase from "./db/JsonDatabase"
-export { JsonDatabase as Database }
+} from "./db/Database"

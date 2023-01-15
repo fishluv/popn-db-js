@@ -57,7 +57,7 @@ export interface FilterOptions {
 
 export type SampleOptions = FilterOptions & { count?: number }
 
-export default class JsonDatabase {
+export default class Database {
   static findChart = (id: string): Chart | null => {
     const chartRecord = allCharts.find(c => c.id === id)
     if (!chartRecord) {
