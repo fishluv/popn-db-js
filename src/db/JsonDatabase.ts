@@ -1,9 +1,9 @@
-import { FilterOptions, SampleOptions } from "./Database"
 import Chart, { ChartConstructorProps } from "../models/Chart"
 import { parseDifficulty } from "../models/Difficulty"
 import ConditionSet from "./ConditionSet"
 import isBuggedBpm from "./isBuggedBpm"
 import isHardestDifficultyForSong from "./isHardestDifficultyForSong"
+import { SranLevel } from "../models"
 
 const allCharts: Array<ChartConstructorProps> = require("../../assets/2022061300.json")
 
@@ -35,6 +35,27 @@ function sampleArray<T>(arr: Array<T>, count: number) {
 
   return shuffled.slice(0, count)
 }
+
+export type IncludeOption = "include" | "exclude" | "only"
+
+export interface FilterOptions {
+  levelMin?: number
+  levelMax?: number
+  ratingMin?: number
+  ratingMax?: number
+  sranLevelMin?: SranLevel
+  sranLevelMax?: SranLevel
+  includeEasy?: boolean
+  includeNormal?: boolean
+  includeHyper?: boolean
+  includeEx?: boolean
+  hardest?: IncludeOption
+  floorInfection?: IncludeOption
+  buggedBpms?: IncludeOption
+  livelyPacks?: IncludeOption
+}
+
+export type SampleOptions = FilterOptions & { count?: number }
 
 export default class JsonDatabase {
   static findChart = (id: string): Chart | null => {
