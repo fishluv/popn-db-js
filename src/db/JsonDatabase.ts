@@ -37,15 +37,7 @@ function sampleArray<T>(arr: Array<T>, count: number) {
 }
 
 export default class JsonDatabase {
-  private static instance = new this()
-
-  static get get() {
-    return this.instance
-  }
-
-  private constructor() {}
-
-  findChart = (id: string): Chart | null => {
+  static findChart = (id: string): Chart | null => {
     const chartRecord = allCharts.find(c => c.id === id)
     if (!chartRecord) {
       return null
@@ -53,11 +45,11 @@ export default class JsonDatabase {
     return this.recordToChart(chartRecord)
   }
 
-  findCharts = (...ids: string[]): Array<Chart | null> => {
+  static findCharts = (...ids: string[]): Array<Chart | null> => {
     return ids.map(this.findChart)
   }
 
-  filterCharts = ({
+  static filterCharts = ({
     levelMin = 1,
     levelMax = 50,
     ratingMin = undefined,
@@ -178,7 +170,9 @@ export default class JsonDatabase {
     return filtered.map(this.recordToChart)
   }
 
-  sampleCharts = (sampleOptions: SampleOptions = {}): Chart[] => {
+  static sampleFilteredCharts = (
+    sampleOptions: SampleOptions = {},
+  ): Chart[] => {
     const { count, ...filterOptions } = sampleOptions
     if (!(count && count > 0)) {
       console.error("`count` must be a positive integer")
@@ -189,7 +183,7 @@ export default class JsonDatabase {
     return sampleArray(filtered, count)
   }
 
-  queryCharts = (query = ""): Chart[] => {
+  static queryCharts = (query = ""): Chart[] => {
     const conditionSet = ConditionSet.fromQuery(query)
     const matchingRecords = allCharts.filter(chart =>
       conditionSet.isSatisfiedByChart(chart),
@@ -197,7 +191,7 @@ export default class JsonDatabase {
     return matchingRecords.map(this.recordToChart)
   }
 
-  sampleQueriedCharts = ({
+  static sampleQueriedCharts = ({
     count,
     query,
   }: { count?: number; query?: string } = {}): Chart[] => {
@@ -214,7 +208,9 @@ export default class JsonDatabase {
     return sampleArray(queried, count)
   }
 
-  private recordToChart = (chartRec: typeof allCharts[number]): Chart => {
+  private static recordToChart = (
+    chartRec: typeof allCharts[number],
+  ): Chart => {
     return new Chart({
       id: chartRec["id"] as string,
       songId: chartRec["songId"] as string,
@@ -236,4 +232,6 @@ export default class JsonDatabase {
       hyrorrePath: chartRec["hyrorrePath"] as string | null,
     })
   }
+
+  private constructor() {}
 }
