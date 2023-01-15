@@ -231,10 +231,10 @@ export default class JsonDatabase {
     buggedBpms = "include",
     livelyPacks = "include",
     */
-    // number condition (level, rating)
-    // number-like condition (sran level)
+    // done - number condition (level, rating)
+    // done - number-like condition (sran level)
     // enum condition (diff)
-    // bool condition (hardest, floor infection, bpm)
+    // include condition (hardest, floor infection, bpm)
     const conditionSet = ConditionSet.fromQuery(query)
     const matchingRecords = allCharts.filter(chart =>
       conditionSet.isSatisfiedByChart(chart),

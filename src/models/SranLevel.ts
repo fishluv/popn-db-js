@@ -22,11 +22,44 @@ export const SRAN_LEVELS = [
   "19",
 ] as const
 
-type SranLevel = typeof SRAN_LEVELS[number] | null
+type SranLevel = typeof SRAN_LEVELS[number]
 export default SranLevel
 
+export function isValidSranLevel(s: string): s is SranLevel {
+  try {
+    parseSranLevel(s)
+    return true
+  } catch {
+    return false
+  }
+}
+
 export function parseSranLevel(s: string): SranLevel {
-  switch (s) {
+  const sNorm = s.replace(/[-弱]/, "a").replace(/[+強]/, "b")
+
+  switch (sNorm) {
+    case "1a":
+      return "01a"
+    case "1b":
+      return "01b"
+    case "2a":
+      return "02a"
+    case "2b":
+      return "02b"
+    case "3":
+      return "03"
+    case "4":
+      return "04"
+    case "5":
+      return "05"
+    case "6":
+      return "06"
+    case "7":
+      return "07"
+    case "8":
+      return "08"
+    case "9":
+      return "09"
     case "01a":
     case "01b":
     case "02a":
@@ -48,7 +81,7 @@ export function parseSranLevel(s: string): SranLevel {
     case "17":
     case "18":
     case "19":
-      return s
+      return sNorm
     default:
       throw new Error(`Invalid sran level ${s}`)
   }
