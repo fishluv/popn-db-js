@@ -34,7 +34,6 @@ abstract class Condition {
     } else if (IdentifierCondition.isValid(tokens)) {
       return IdentifierCondition.fromTokens(tokens)
     }
-    // TODO: Add other conditions here.
 
     throw new Error(`Invalid condition: [${condStr}]`)
   }
