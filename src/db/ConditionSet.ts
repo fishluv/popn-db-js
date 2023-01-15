@@ -274,7 +274,13 @@ class DifficultyCondition extends Condition {
 }
 
 // Suspending Lively support indefinitely.
-type Identifier = "buggedbpm" | "hardest" | "floorinfection" | "upper" | "ura"
+type Identifier =
+  | "buggedbpm"
+  | "hardest"
+  | "holds"
+  | "floorinfection"
+  | "upper"
+  | "ura"
 type IdentifierConditionValue = Identifier | `!${Identifier}`
 
 class IdentifierCondition extends Condition {
@@ -295,6 +301,8 @@ class IdentifierCondition extends Condition {
       "!buggedbpm",
       "hardest",
       "!hardest",
+      "holds",
+      "!holds",
       "floorinfection",
       "!floorinfection",
       "upper",
@@ -321,6 +329,10 @@ class IdentifierCondition extends Condition {
         return isHardestDifficultyForSong(chart.difficulty, chart.songId)
       case "!hardest":
         return !isHardestDifficultyForSong(chart.difficulty, chart.songId)
+      case "holds":
+        return chart.hasHolds
+      case "!holds":
+        return !chart.hasHolds
       case "floorinfection":
         return chart.songLabels.includes("floor_infection")
       case "!floorinfection":
