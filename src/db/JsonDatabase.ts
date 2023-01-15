@@ -1,7 +1,9 @@
 import { FilterOptions, SampleOptions } from "./Database"
 import Chart, { ChartConstructorProps } from "../models/Chart"
-import Difficulty, { parseDifficulty } from "../models/Difficulty"
+import { parseDifficulty } from "../models/Difficulty"
 import ConditionSet from "./ConditionSet"
+import isBuggedBpm from "./isBuggedBpm"
+import isHardestDifficultyForSong from "./isHardestDifficultyForSong"
 
 const allCharts: Array<ChartConstructorProps> = require("../../assets/2022061300.json")
 
@@ -18,33 +20,6 @@ function isNotBlank(
   x: boolean | number | string | null | undefined,
 ): x is boolean | number | string {
   return x !== null && x !== undefined && x !== ""
-}
-
-function isBuggedBpm(bpmStr: string | null): boolean {
-  if (bpmStr === null) {
-    return false
-  }
-
-  const bpms = bpmStr.match(/\d+/g) || []
-  const bpmNums = bpms.map(Number)
-  return bpmNums.some(bpm => {
-    const dividend = 3600 / bpm
-    return dividend === Math.floor(dividend)
-  })
-}
-
-function isHardestDifficultyForSong(
-  difficulty: Difficulty,
-  songId: string,
-): boolean {
-  const hardestDiff = allCharts
-    .filter(c => c.songId === songId)
-    .map(c => c.difficulty)
-    .sort((a, b) => {
-      const diffsOrdered = ["ex", "h", "n", "e"]
-      return diffsOrdered.indexOf(a) - diffsOrdered.indexOf(b)
-    })[0]
-  return difficulty === hardestDiff
 }
 
 function sampleArray<T>(arr: Array<T>, count: number) {
@@ -215,16 +190,6 @@ export default class JsonDatabase {
   }
 
   queryCharts = (query = ""): Chart[] => {
-    /*
-    hardest = "include",
-    floorInfection = "include",
-    buggedBpms = "include",
-    livelyPacks = "include",
-    */
-    // done - number condition (level, rating)
-    // done - number-like condition (sran level)
-    // done - enum condition (diff)
-    // include condition (hardest, floor infection, bpm)
     const conditionSet = ConditionSet.fromQuery(query)
     const matchingRecords = allCharts.filter(chart =>
       conditionSet.isSatisfiedByChart(chart),

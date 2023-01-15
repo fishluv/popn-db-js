@@ -2,6 +2,8 @@ import { parseSranLevel, SranLevel } from "../models"
 import { ChartConstructorProps } from "../models/Chart"
 import Difficulty, { parseDifficulty } from "../models/Difficulty"
 import { isValidSranLevel } from "../models/SranLevel"
+import isBuggedBpm from "./isBuggedBpm"
+import isHardestDifficultyForSong from "./isHardestDifficultyForSong"
 
 type EqualityOperator = "=" | "!="
 type NumericalOperator = "=" | "!=" | ">" | ">=" | "<" | "<="
@@ -10,7 +12,8 @@ type NumericalOperator = "=" | "!=" | ">" | ">=" | "<" | "<="
 //   ">=" will get matched as ">" and "="
 //   "2a" will get matched as "2" and "a"
 //   etc.
-const TOKEN_REGEX = /(!=|>=|<=|=|>|<|0?(1|2)(a|-|弱|b|\+|強)|[a-z]+|[+-\d.]+)/g
+const TOKEN_REGEX =
+  /(!=|>=|<=|=|>|<|0?(1|2)(a|-|弱|b|\+|強)|!?[a-z]+|[+-\d.]+)/g
 
 abstract class Condition {
   static fromString(condStr: string): Condition {
@@ -28,6 +31,8 @@ abstract class Condition {
       return SranLevelCondition.fromTokens(tokens)
     } else if (DifficultyCondition.isValid(tokens)) {
       return DifficultyCondition.fromTokens(tokens)
+    } else if (IdentifierCondition.isValid(tokens)) {
+      return IdentifierCondition.fromTokens(tokens)
     }
     // TODO: Add other conditions here.
 
@@ -264,6 +269,70 @@ class DifficultyCondition extends Condition {
         return this.value.includes(chartValue)
       case "!=":
         return !this.value.includes(chartValue)
+    }
+  }
+}
+
+// Suspending Lively support indefinitely.
+type Identifier = "buggedbpm" | "hardest" | "floorinfection" | "upper" | "ura"
+type IdentifierConditionValue = Identifier | `!${Identifier}`
+
+class IdentifierCondition extends Condition {
+  static isValid(tokens: string[]): tokens is [IdentifierConditionValue] {
+    if (tokens.length === 1) {
+      return this.isValidValue(tokens[0])
+    }
+    return false
+  }
+
+  static fromTokens(tokens: [IdentifierConditionValue]) {
+    return new IdentifierCondition(tokens[0])
+  }
+
+  private static isValidValue(identifier: string) {
+    return [
+      "buggedbpm",
+      "!buggedbpm",
+      "hardest",
+      "!hardest",
+      "floorinfection",
+      "!floorinfection",
+      "upper",
+      "!upper",
+      "ura",
+      "!ura",
+    ].includes(identifier)
+  }
+
+  readonly value: IdentifierConditionValue
+
+  constructor(value: IdentifierConditionValue) {
+    super()
+    this.value = value
+  }
+
+  isSatisfiedByChart(chart: ChartConstructorProps): boolean {
+    switch (this.value) {
+      case "buggedbpm":
+        return isBuggedBpm(chart.bpm)
+      case "!buggedbpm":
+        return !isBuggedBpm(chart.bpm)
+      case "hardest":
+        return isHardestDifficultyForSong(chart.difficulty, chart.songId)
+      case "!hardest":
+        return !isHardestDifficultyForSong(chart.difficulty, chart.songId)
+      case "floorinfection":
+        return chart.songLabels.includes("floor_infection")
+      case "!floorinfection":
+        return !chart.songLabels.includes("floor_infection")
+      case "upper":
+        return chart.songLabels.includes("upper")
+      case "!upper":
+        return !chart.songLabels.includes("upper")
+      case "ura":
+        return chart.songLabels.includes("ura")
+      case "!ura":
+        return !chart.songLabels.includes("ura")
     }
   }
 }
