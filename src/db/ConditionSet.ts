@@ -1,9 +1,10 @@
 import { parseSranLevel, SranLevel } from "../models"
 import { ChartConstructorProps } from "../models/Chart"
+import Difficulty, { parseDifficulty } from "../models/Difficulty"
 import { isValidSranLevel } from "../models/SranLevel"
 
-const NUMERICAL_OPERATORS = ["=", "!=", ">", ">=", "<", "<="] as const
-type NumericalOperator = typeof NUMERICAL_OPERATORS[number]
+type EqualityOperator = "=" | "!="
+type NumericalOperator = "=" | "!=" | ">" | ">=" | "<" | "<="
 
 // Need to put longer tokens first or else:
 //   ">=" will get matched as ">" and "="
@@ -13,8 +14,11 @@ const TOKEN_REGEX = /(!=|>=|<=|=|>|<|0?(1|2)(a|-|弱|b|\+|強)|[a-z]+|[+-\d.]+)/
 
 abstract class Condition {
   static fromString(condStr: string): Condition {
-    const spacedOut = condStr.replace(TOKEN_REGEX, " $1 ")
-    const tokens = spacedOut.split(/\s+/).filter(Boolean)
+    const tokens = condStr
+      .toLowerCase()
+      .replace(TOKEN_REGEX, " $1 ")
+      .split(/\s+/)
+      .filter(Boolean)
 
     if (LevelCondition.isValid(tokens)) {
       return LevelCondition.fromTokens(tokens)
@@ -22,6 +26,8 @@ abstract class Condition {
       return RatingCondition.fromTokens(tokens)
     } else if (SranLevelCondition.isValid(tokens)) {
       return SranLevelCondition.fromTokens(tokens)
+    } else if (DifficultyCondition.isValid(tokens)) {
+      return DifficultyCondition.fromTokens(tokens)
     }
     // TODO: Add other conditions here.
 
@@ -209,6 +215,55 @@ class SranLevelCondition extends Condition {
         return chartValue < this.value
       case "<=":
         return chartValue <= this.value
+    }
+  }
+}
+
+class DifficultyCondition extends Condition {
+  static isValid(
+    tokens: string[],
+  ): tokens is ["diff", EqualityOperator, string] {
+    if (tokens.length === 3) {
+      const [field, operator, value] = tokens
+      return (
+        field === "diff" &&
+        this.isValidOperator(operator) &&
+        this.isValidValue(value)
+      )
+    }
+    return false
+  }
+
+  static fromTokens(tokens: ["diff", EqualityOperator, string]) {
+    const [_, operator, value] = tokens
+    return new DifficultyCondition(operator, value)
+  }
+
+  private static isValidOperator(operator: string) {
+    return ["=", "!="].includes(operator)
+  }
+
+  private static isValidValue(value: string) {
+    return /^[enhx]+$/.test(value)
+  }
+
+  readonly operator: EqualityOperator
+  readonly value: Difficulty[]
+
+  constructor(operator: EqualityOperator, value: string) {
+    super()
+    this.operator = operator
+    this.value = [...value].map(parseDifficulty)
+  }
+
+  isSatisfiedByChart(chart: ChartConstructorProps): boolean {
+    const chartValue = chart.difficulty
+
+    switch (this.operator) {
+      case "=":
+        return this.value.includes(chartValue)
+      case "!=":
+        return !this.value.includes(chartValue)
     }
   }
 }

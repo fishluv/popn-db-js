@@ -216,16 +216,6 @@ export default class JsonDatabase {
 
   queryCharts = (query = ""): Chart[] => {
     /*
-        levelMin = 1,
-    levelMax = 50,
-    ratingMin = undefined,
-    ratingMax = undefined,
-    sranLevelMin = undefined,
-    sranLevelMax = undefined,
-    includeEasy = true,
-    includeNormal = true,
-    includeHyper = true,
-    includeEx = true,
     hardest = "include",
     floorInfection = "include",
     buggedBpms = "include",
@@ -233,7 +223,7 @@ export default class JsonDatabase {
     */
     // done - number condition (level, rating)
     // done - number-like condition (sran level)
-    // enum condition (diff)
+    // done - enum condition (diff)
     // include condition (hardest, floor infection, bpm)
     const conditionSet = ConditionSet.fromQuery(query)
     const matchingRecords = allCharts.filter(chart =>

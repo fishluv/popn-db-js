@@ -15,6 +15,8 @@ export function parseDifficulty(s: string | null): Difficulty {
       return "n"
     case "hyper":
       return "h"
+    case "x":
+      return "ex"
     default:
       throw new Error(`Invalid difficulty ${s}`)
   }
