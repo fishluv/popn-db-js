@@ -1,6 +1,7 @@
 import { parseSranLevel, SranLevel } from "../models"
 import { ChartConstructorProps } from "../models/Chart"
 import Difficulty, { parseDifficulty } from "../models/Difficulty"
+import Folder, { parseFolder } from "../models/Folder"
 import { isValidSranLevel } from "../models/SranLevel"
 import isBuggedBpm from "./isBuggedBpm"
 import isHardestDifficultyForSong from "./isHardestDifficultyForSong"
@@ -13,7 +14,7 @@ type NumericalOperator = "=" | "!=" | ">" | ">=" | "<" | "<="
 //   "2a" will get matched as "2" and "a"
 //   etc.
 const TOKEN_REGEX =
-  /(!=|>=|<=|=|>|<|0?(1|2)(a|-|弱|b|\+|強)|!?[a-z]+|[+-\d.]+)/g
+  /(!=|>=|<=|=|>|<|(cs|\d{2})+|0?(1|2)(a|-|弱|b|\+|強)|!?[a-z]+|[+-\d.]+)/g
 
 abstract class Condition {
   static fromString(condStr: string): Condition {
@@ -33,6 +34,8 @@ abstract class Condition {
       return DifficultyCondition.fromTokens(tokens)
     } else if (IdentifierCondition.isValid(tokens)) {
       return IdentifierCondition.fromTokens(tokens)
+    } else if (FolderCondition.isValid(tokens)) {
+      return FolderCondition.fromTokens(tokens)
     }
 
     throw new Error(`Invalid condition: [${condStr}]`)
@@ -41,6 +44,9 @@ abstract class Condition {
   abstract isSatisfiedByChart(chart: ChartConstructorProps): boolean
 }
 
+/**
+ * lv = 50
+ */
 class LevelCondition extends Condition {
   static isValid(
     tokens: string[],
@@ -102,6 +108,9 @@ class LevelCondition extends Condition {
   }
 }
 
+/**
+ * rat = 0.0
+ */
 class RatingCondition extends Condition {
   static isValid(
     tokens: string[],
@@ -163,6 +172,9 @@ class RatingCondition extends Condition {
   }
 }
 
+/**
+ * srlv = 1a
+ */
 class SranLevelCondition extends Condition {
   static isValid(
     tokens: string[],
@@ -223,6 +235,9 @@ class SranLevelCondition extends Condition {
   }
 }
 
+/**
+ * diff = enhx
+ */
 class DifficultyCondition extends Condition {
   static isValid(
     tokens: string[],
@@ -282,6 +297,9 @@ type Identifier =
   | "ura"
 type IdentifierConditionValue = Identifier | `!${Identifier}`
 
+/**
+ * buggedbpm, hardest, holds, floorinfection, upper, ura
+ */
 class IdentifierCondition extends Condition {
   static isValid(tokens: string[]): tokens is [IdentifierConditionValue] {
     if (tokens.length === 1) {
@@ -344,6 +362,58 @@ class IdentifierCondition extends Condition {
         return chart.songLabels.includes("ura")
       case "!ura":
         return !chart.songLabels.includes("ura")
+    }
+  }
+}
+
+/**
+ * fol = cs0102030405
+ */
+class FolderCondition extends Condition {
+  static REGEX =
+    /cs|01|02|03|04|05|06|07|08|09|10|11|12|13|14|15|16|17|18|19|20|21|22|23|24|25|26/g
+
+  static isValid(
+    tokens: string[],
+  ): tokens is ["fol", EqualityOperator, string] {
+    if (tokens.length === 3) {
+      const [field, operator, value] = tokens
+      return (
+        field === "fol" &&
+        this.isValidOperator(operator) &&
+        this.isValidValue(value)
+      )
+    }
+    return false
+  }
+
+  static fromTokens(tokens: ["fol", EqualityOperator, string]) {
+    const [_, operator, value] = tokens
+    return new FolderCondition(operator, value)
+  }
+
+  private static isValidOperator(operator: string) {
+    return ["=", "!="].includes(operator)
+  }
+
+  private static isValidValue(value: string) {
+    return this.REGEX.test(value)
+  }
+
+  readonly operator: EqualityOperator
+  readonly value: Folder[]
+
+  constructor(operator: EqualityOperator, value: string) {
+    super()
+    this.operator = operator
+    this.value = value.match(FolderCondition.REGEX)!.map(parseFolder)
+  }
+
+  isSatisfiedByChart(chart: ChartConstructorProps): boolean {
+    if (this.operator === "=") {
+      return this.value.includes(chart.songFolder)
+    } else {
+      return !this.value.includes(chart.songFolder)
     }
   }
 }

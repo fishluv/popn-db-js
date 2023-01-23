@@ -1,10 +1,11 @@
 import Difficulty from "./Difficulty"
+import Folder from "./Folder"
 
 // Does not necessary map 1-1 to Chart props.
 export interface ChartConstructorProps {
   id: string
   songId: string
-  songFolder: string
+  songFolder: Folder
   difficulty: Difficulty
   level: number
   hasHolds: boolean
@@ -25,7 +26,7 @@ export interface ChartConstructorProps {
 export default class Chart {
   readonly id: string
   readonly songId: string
-  readonly songFolder: string
+  readonly songFolder: Folder
   readonly difficulty: Difficulty
   readonly level: number
   readonly hasHolds: boolean
