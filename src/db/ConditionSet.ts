@@ -24,7 +24,9 @@ abstract class Condition {
       .split(/\s+/)
       .filter(Boolean)
 
-    if (LevelCondition.isValid(tokens)) {
+    if (FalseCondition.isValid(tokens)) {
+      return new FalseCondition()
+    } else if (LevelCondition.isValid(tokens)) {
       return LevelCondition.fromTokens(tokens)
     } else if (RatingCondition.isValid(tokens)) {
       return RatingCondition.fromTokens(tokens)
@@ -42,6 +44,28 @@ abstract class Condition {
   }
 
   abstract isSatisfiedByChart(chart: ChartConstructorProps): boolean
+}
+
+/**
+ * Conditions that match no charts:
+ *  "diff ="
+ *  "fol ="
+ */
+class FalseCondition extends Condition {
+  static isValid(tokens: string[]) {
+    if (tokens.length === 2) {
+      const [first, second] = tokens
+      return (
+        (first === "diff" && second === "=") ||
+        (first === "fol" && second === "=")
+      )
+    }
+    return false
+  }
+
+  isSatisfiedByChart(): boolean {
+    return false
+  }
 }
 
 /**
