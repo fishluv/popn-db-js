@@ -1,4 +1,9 @@
-type Difficulty = "e" | "n" | "h" | "ex"
+/**
+ * Difficulties in ascending order.
+ */
+export const DIFFICULTIES = ["e", "n", "h", "x"] as const
+
+type Difficulty = typeof DIFFICULTIES[number]
 export default Difficulty
 
 export function parseDifficulty(s: string | null): Difficulty {
@@ -7,7 +12,7 @@ export function parseDifficulty(s: string | null): Difficulty {
     case "e":
     case "n":
     case "h":
-    case "ex":
+    case "x":
       return sl
     case "easy":
       return "e"
@@ -15,8 +20,8 @@ export function parseDifficulty(s: string | null): Difficulty {
       return "n"
     case "hyper":
       return "h"
-    case "x":
-      return "ex"
+    case "ex":
+      return "x"
     default:
       throw new Error(`Invalid difficulty ${s}`)
   }
