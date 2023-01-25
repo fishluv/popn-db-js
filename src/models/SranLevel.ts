@@ -1,3 +1,6 @@
+/**
+ * Sran levels in ascending order.
+ */
 export const SRAN_LEVELS = [
   "01a",
   "01b",

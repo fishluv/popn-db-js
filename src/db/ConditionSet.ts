@@ -1,11 +1,13 @@
-import { parseSranLevel, SranLevel } from "../models"
 import { ChartConstructorProps } from "../models/Chart"
 import Difficulty, { parseDifficulty } from "../models/Difficulty"
 import VersionFolder, {
   parseVersionFolder,
   VERSION_FOLDERS,
 } from "../models/VersionFolder"
-import { isValidSranLevel } from "../models/SranLevel"
+import SranLevel, {
+  isValidSranLevel,
+  parseSranLevel,
+} from "../models/SranLevel"
 import isBuggedBpm from "./isBuggedBpm"
 import isHardestDifficultyForSong from "./isHardestDifficultyForSong"
 

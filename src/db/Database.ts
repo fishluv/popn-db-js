@@ -1,9 +1,9 @@
 import Chart, { ChartConstructorProps } from "../models/Chart"
 import { parseDifficulty } from "../models/Difficulty"
+import SranLevel from "../models/SranLevel"
 import ConditionSet from "./ConditionSet"
 import isBuggedBpm from "./isBuggedBpm"
 import isHardestDifficultyForSong from "./isHardestDifficultyForSong"
-import { SranLevel } from "../models"
 
 const allCharts: Array<ChartConstructorProps> = require("../../assets/2022061300.json")
 

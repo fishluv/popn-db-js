@@ -1,6 +1,5 @@
-import { Difficulty } from "../models"
 import { ChartConstructorProps } from "../models/Chart"
-import { DIFFICULTIES, parseDifficulty } from "../models/Difficulty"
+import Difficulty, { DIFFICULTIES, parseDifficulty } from "../models/Difficulty"
 
 const allCharts: Array<ChartConstructorProps> = require("../../assets/2022061300.json")
 
