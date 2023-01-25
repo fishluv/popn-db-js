@@ -4,7 +4,6 @@ import ConditionSet from "./ConditionSet"
 import isBuggedBpm from "./isBuggedBpm"
 import isHardestDifficultyForSong from "./isHardestDifficultyForSong"
 import { SranLevel } from "../models"
-import { parseFolder } from "../models/Folder"
 
 const allCharts: Array<ChartConstructorProps> = require("../../assets/2022061300.json")
 
@@ -179,7 +178,7 @@ export default class Database {
 
         if (
           hardest === "only" &&
-          !isHardestDifficultyForSong(difficulty, songId)
+          !isHardestDifficultyForSong(parseDifficulty(difficulty), songId)
         ) {
           // Put this last because it's expensive.
           return false
@@ -236,8 +235,8 @@ export default class Database {
     return new Chart({
       id: chartRec["id"] as string,
       songId: chartRec["songId"] as string,
-      songFolder: parseFolder(chartRec["songFolder"] as string),
-      difficulty: parseDifficulty(chartRec["difficulty"] as string),
+      songFolder: chartRec["songFolder"] as string,
+      difficulty: chartRec["difficulty"] as string,
       level: Number(chartRec["level"]),
       hasHolds: chartRec["hasHolds"] as boolean,
       title: chartRec["title"] as string,

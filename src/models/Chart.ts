@@ -1,12 +1,12 @@
-import Difficulty from "./Difficulty"
-import Folder from "./Folder"
+import Difficulty, { parseDifficulty } from "./Difficulty"
+import Folder, { parseVersionFolder } from "./VersionFolder"
 
 // Does not necessary map 1-1 to Chart props.
 export interface ChartConstructorProps {
   id: string
   songId: string
-  songFolder: Folder
-  difficulty: Difficulty
+  songFolder: string
+  difficulty: string
   level: number
   hasHolds: boolean
   title: string
@@ -65,8 +65,8 @@ export default class Chart {
   }: ChartConstructorProps) {
     this.id = id
     this.songId = songId
-    this.songFolder = songFolder
-    this.difficulty = difficulty
+    this.songFolder = parseVersionFolder(songFolder)
+    this.difficulty = parseDifficulty(difficulty)
     this.level = level
     this.hasHolds = hasHolds
     this.title = title

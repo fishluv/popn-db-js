@@ -1,7 +1,10 @@
 import { parseSranLevel, SranLevel } from "../models"
 import { ChartConstructorProps } from "../models/Chart"
 import Difficulty, { parseDifficulty } from "../models/Difficulty"
-import Folder, { parseFolder } from "../models/Folder"
+import VersionFolder, {
+  parseVersionFolder,
+  VERSION_FOLDERS,
+} from "../models/VersionFolder"
 import { isValidSranLevel } from "../models/SranLevel"
 import isBuggedBpm from "./isBuggedBpm"
 import isHardestDifficultyForSong from "./isHardestDifficultyForSong"
@@ -36,8 +39,8 @@ abstract class Condition {
       return DifficultyCondition.fromTokens(tokens)
     } else if (IdentifierCondition.isValid(tokens)) {
       return IdentifierCondition.fromTokens(tokens)
-    } else if (FolderCondition.isValid(tokens)) {
-      return FolderCondition.fromTokens(tokens)
+    } else if (VersionFolderCondition.isValid(tokens)) {
+      return VersionFolderCondition.fromTokens(tokens)
     }
 
     throw new Error(`Invalid condition: [${condStr}]`)
@@ -49,7 +52,7 @@ abstract class Condition {
 /**
  * Conditions that match no charts:
  *  "diff ="
- *  "fol ="
+ *  "ver ="
  */
 class FalseCondition extends Condition {
   static isValid(tokens: string[]) {
@@ -57,7 +60,7 @@ class FalseCondition extends Condition {
       const [first, second] = tokens
       return (
         (first === "diff" && second === "=") ||
-        (first === "fol" && second === "=")
+        (first === "ver" && second === "=")
       )
     }
     return false
@@ -300,7 +303,7 @@ class DifficultyCondition extends Condition {
   }
 
   isSatisfiedByChart(chart: ChartConstructorProps): boolean {
-    const chartValue = chart.difficulty
+    const chartValue = parseDifficulty(chart.difficulty)
 
     switch (this.operator) {
       case "=":
@@ -367,9 +370,15 @@ class IdentifierCondition extends Condition {
       case "!buggedbpm":
         return !isBuggedBpm(chart.bpm)
       case "hardest":
-        return isHardestDifficultyForSong(chart.difficulty, chart.songId)
+        return isHardestDifficultyForSong(
+          parseDifficulty(chart.difficulty),
+          chart.songId,
+        )
       case "!hardest":
-        return !isHardestDifficultyForSong(chart.difficulty, chart.songId)
+        return !isHardestDifficultyForSong(
+          parseDifficulty(chart.difficulty),
+          chart.songId,
+        )
       case "holds":
         return chart.hasHolds
       case "!holds":
@@ -391,19 +400,18 @@ class IdentifierCondition extends Condition {
 }
 
 /**
- * fol = cs0102030405
+ * ver = cs0102030405
  */
-class FolderCondition extends Condition {
-  static REGEX =
-    /cs|01|02|03|04|05|06|07|08|09|10|11|12|13|14|15|16|17|18|19|20|21|22|23|24|25|26/g
+class VersionFolderCondition extends Condition {
+  static REGEX = new RegExp(VERSION_FOLDERS.join("|"), "g")
 
   static isValid(
     tokens: string[],
-  ): tokens is ["fol", EqualityOperator, string] {
+  ): tokens is ["ver", EqualityOperator, string] {
     if (tokens.length === 3) {
       const [field, operator, value] = tokens
       return (
-        field === "fol" &&
+        field === "ver" &&
         this.isValidOperator(operator) &&
         this.isValidValue(value)
       )
@@ -411,9 +419,9 @@ class FolderCondition extends Condition {
     return false
   }
 
-  static fromTokens(tokens: ["fol", EqualityOperator, string]) {
+  static fromTokens(tokens: ["ver", EqualityOperator, string]) {
     const [_, operator, value] = tokens
-    return new FolderCondition(operator, value)
+    return new VersionFolderCondition(operator, value)
   }
 
   private static isValidOperator(operator: string) {
@@ -425,19 +433,23 @@ class FolderCondition extends Condition {
   }
 
   readonly operator: EqualityOperator
-  readonly value: Folder[]
+  readonly value: VersionFolder[]
 
   constructor(operator: EqualityOperator, value: string) {
     super()
     this.operator = operator
-    this.value = value.match(FolderCondition.REGEX)!.map(parseFolder)
+    this.value = value
+      .match(VersionFolderCondition.REGEX)!
+      .map(parseVersionFolder)
   }
 
   isSatisfiedByChart(chart: ChartConstructorProps): boolean {
+    const chartValue = parseVersionFolder(chart.songFolder)
+
     if (this.operator === "=") {
-      return this.value.includes(chart.songFolder)
+      return this.value.includes(chartValue)
     } else {
-      return !this.value.includes(chart.songFolder)
+      return !this.value.includes(chartValue)
     }
   }
 }
