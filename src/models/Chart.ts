@@ -1,5 +1,5 @@
 import Difficulty, { parseDifficulty } from "./Difficulty"
-import Folder, { parseVersionFolder } from "./VersionFolder"
+import VersionFolder, { parseVersionFolder } from "./VersionFolder"
 
 // Does not necessary map 1-1 to Chart props.
 export interface ChartConstructorProps {
@@ -26,7 +26,7 @@ export interface ChartConstructorProps {
 export default class Chart {
   readonly id: string
   readonly songId: string
-  readonly songFolder: Folder
+  readonly songFolder: VersionFolder
   readonly difficulty: Difficulty
   readonly level: number
   readonly hasHolds: boolean
