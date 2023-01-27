@@ -65,6 +65,8 @@ export function parseVersionFolder(s: string | null): VersionFolder {
     case "25":
     case "26":
       return snorm
+    case "00":
+      return "cs"
     default:
       throw new Error(`Invalid version folder ${s}`)
   }
