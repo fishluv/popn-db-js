@@ -19,7 +19,7 @@ type NumericalOperator = "=" | "!=" | ">" | ">=" | "<" | "<="
 //   "2a" will get matched as "2" and "a"
 //   etc.
 const TOKEN_REGEX =
-  /(!=|>=|<=|=|>|<|(cs|\d{2})+|0?(1|2)(a|-|弱|b|\+|強)|!?[a-z]+|[+-\d.]+)/g
+  /(!=|>=|<=|=|>|<|0?(1|2)(a|-|弱|b|\+|強)|(cs|\d{2})+|!?[a-z]+|[+-\d.]+)/g
 
 abstract class Condition {
   static fromString(condStr: string): Condition {
@@ -45,7 +45,7 @@ abstract class Condition {
       return VersionFolderCondition.fromTokens(tokens)
     }
 
-    throw new Error(`Invalid condition: [${condStr}]`)
+    throw new Error(`Invalid condition: [${condStr}]: tokenized as [${tokens}]`)
   }
 
   abstract isSatisfiedByChart(chart: ChartConstructorProps): boolean
