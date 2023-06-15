@@ -1,6 +1,6 @@
 # popn-db-js
 
-Node client for pop'n sqlite db.
+Node client for [popn-dbs](https://github.com/fishluv/popn-dbs).
 
 ## Usage
 
