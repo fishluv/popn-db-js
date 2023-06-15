@@ -1,7 +1,7 @@
 import Difficulty, { parseDifficulty } from "./Difficulty"
 import VersionFolder, { parseVersionFolder } from "./VersionFolder"
 
-// Does not necessary map 1-1 to Chart props.
+// Does not necessarily map 1-1 to Chart props.
 export interface ChartConstructorProps {
   id: string
   songId: string
@@ -20,6 +20,7 @@ export interface ChartConstructorProps {
   sranLevel: string | null
   songLabels: string[]
   remyWikiPath: string
+  songSlug: string | null
   hyrorrePath: string | null
 }
 
@@ -41,6 +42,7 @@ export default class Chart {
   readonly sranLevel: string | null
   readonly songLabels: string[]
   readonly remyWikiUrl: string
+  readonly songSlug: string | null
   readonly hyrorreUrl: string | null
 
   constructor({
@@ -61,6 +63,7 @@ export default class Chart {
     sranLevel,
     songLabels,
     remyWikiPath,
+    songSlug,
     hyrorrePath,
   }: ChartConstructorProps) {
     this.id = id
@@ -80,9 +83,10 @@ export default class Chart {
     this.sranLevel = sranLevel
     this.songLabels = songLabels
     this.remyWikiUrl = `https://remywiki.com/${remyWikiPath}`
+    this.songSlug = songSlug
     this.hyrorreUrl =
       hyrorrePath === null
         ? null
-        : `https://popn.hyrorre.com/%E9%9B%A3%E6%98%93%E5%BA%A6%E8%A1%A8/${hyrorrePath}`
+        : `https://popn.wiki/%E9%9B%A3%E6%98%93%E5%BA%A6%E8%A1%A8/${hyrorrePath}`
   }
 }
