@@ -1,5 +1,5 @@
 import Chart, { ChartConstructorProps } from "../models/Chart"
-import { parseDifficulty } from "../models/Difficulty"
+import Difficulty, { parseDifficulty } from "../models/Difficulty"
 import SranLevel from "../models/SranLevel"
 import ConditionSet from "./ConditionSet"
 import isBuggedBpm from "./isBuggedBpm"
@@ -77,6 +77,19 @@ class Database {
 
   findCharts = (...ids: string[]): Array<Chart | null> => {
     return ids.map(this.findChart)
+  }
+
+  findChartBySongSlug = (
+    songSlug: string,
+    difficulty: Difficulty,
+  ): Chart | null => {
+    const chartRecord = this.allCharts.find(
+      c => c.songSlug === songSlug && c.difficulty === difficulty,
+    )
+    if (!chartRecord) {
+      return null
+    }
+    return Database.recordToChart(chartRecord)
   }
 
   filterCharts = ({
