@@ -20,7 +20,7 @@ export interface ChartConstructorProps {
   sranLevel: string | null
   songLabels: string[]
   remyWikiPath: string
-  songSlug: string | null
+  songSlug: string
   hyrorrePath: string | null
 }
 
@@ -42,7 +42,7 @@ export default class Chart {
   readonly sranLevel: string | null
   readonly songLabels: string[]
   readonly remyWikiUrl: string
-  readonly songSlug: string | null
+  readonly songSlug: string
   readonly hyrorreUrl: string | null
 
   constructor({

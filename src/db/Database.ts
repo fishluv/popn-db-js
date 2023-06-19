@@ -255,7 +255,7 @@ class Database {
       sranLevel: chartRec["sranLevel"] as string | null,
       songLabels: chartRec["songLabels"] as string[],
       remyWikiPath: chartRec["remyWikiPath"] as string,
-      songSlug: chartRec["songSlug"] as string | null,
+      songSlug: chartRec["songSlug"] as string,
       hyrorrePath: chartRec["hyrorrePath"] as string | null,
     })
   }
