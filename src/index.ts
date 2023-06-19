@@ -22,7 +22,9 @@ export {
 }
 
 export {
-  default as Database,
+  Kaimei as Database, // For backwards compatibility
+  Kaimei,
+  Unilab,
   IncludeOption,
   FilterOptions as ChartFilterOptions,
   SampleOptions as ChartSampleOptions,

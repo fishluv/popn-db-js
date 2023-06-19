@@ -5,7 +5,8 @@ import ConditionSet from "./ConditionSet"
 import isBuggedBpm from "./isBuggedBpm"
 import isHardestDifficultyForSong from "./isHardestDifficultyForSong"
 
-const allCharts: Array<ChartConstructorProps> = require("../../assets/2022061300.json")
+const kaimeiCharts: Array<ChartConstructorProps> = require("../../assets/2022061300.json")
+const unilabCharts: Array<ChartConstructorProps> = require("../../assets/2022091300.json")
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 function toNullableNumber(val: any): number | null {
@@ -57,20 +58,28 @@ export interface FilterOptions {
 
 export type SampleOptions = FilterOptions & { count?: number }
 
-export default class Database {
-  static findChart = (id: string): Chart | null => {
-    const chartRecord = allCharts.find(c => c.id === id)
+class Database {
+  private readonly allCharts: Array<ChartConstructorProps>
+  private readonly datecode: String
+
+  constructor(allCharts: Array<ChartConstructorProps>, datecode: String) {
+    this.allCharts = allCharts
+    this.datecode = datecode
+  }
+
+  findChart = (id: string): Chart | null => {
+    const chartRecord = this.allCharts.find(c => c.id === id)
     if (!chartRecord) {
       return null
     }
-    return this.recordToChart(chartRecord)
+    return Database.recordToChart(chartRecord)
   }
 
-  static findCharts = (...ids: string[]): Array<Chart | null> => {
+  findCharts = (...ids: string[]): Array<Chart | null> => {
     return ids.map(this.findChart)
   }
 
-  static filterCharts = ({
+  filterCharts = ({
     levelMin = 1,
     levelMax = 50,
     ratingMin = undefined,
@@ -97,7 +106,7 @@ export default class Database {
     const normSranMin = sranLevelMin ?? "01"
     const normSranMax = sranLevelMax ?? "19"
 
-    const filtered = allCharts.filter(
+    const filtered = this.allCharts.filter(
       ({ songId, difficulty, level, bpm, rating, sranLevel, songLabels }) => {
         if (level < levelMin) {
           return false
@@ -188,12 +197,10 @@ export default class Database {
       },
     )
 
-    return filtered.map(this.recordToChart)
+    return filtered.map(Database.recordToChart)
   }
 
-  static sampleFilteredCharts = (
-    sampleOptions: SampleOptions = {},
-  ): Chart[] => {
+  sampleFilteredCharts = (sampleOptions: SampleOptions = {}): Chart[] => {
     const { count, ...filterOptions } = sampleOptions
     if (!(count && count > 0)) {
       console.error("`count` must be a positive integer")
@@ -204,15 +211,15 @@ export default class Database {
     return sampleArray(filtered, count)
   }
 
-  static queryCharts = (query = ""): Chart[] => {
+  queryCharts = (query = ""): Chart[] => {
     const conditionSet = ConditionSet.fromQuery(query)
-    const matchingRecords = allCharts.filter(chart =>
+    const matchingRecords = this.allCharts.filter(chart =>
       conditionSet.isSatisfiedByChart(chart),
     )
-    return matchingRecords.map(this.recordToChart)
+    return matchingRecords.map(Database.recordToChart)
   }
 
-  static sampleQueriedCharts = ({
+  sampleQueriedCharts = ({
     count,
     query,
   }: { count?: number; query?: string } = {}): Chart[] => {
@@ -229,9 +236,7 @@ export default class Database {
     return sampleArray(queried, count)
   }
 
-  private static recordToChart = (
-    chartRec: typeof allCharts[number],
-  ): Chart => {
+  private static recordToChart = (chartRec: ChartConstructorProps): Chart => {
     return new Chart({
       id: chartRec["id"] as string,
       songId: chartRec["songId"] as string,
@@ -254,6 +259,8 @@ export default class Database {
       hyrorrePath: chartRec["hyrorrePath"] as string | null,
     })
   }
-
-  private constructor() {}
 }
+
+export const Kaimei = new Database(kaimeiCharts, "2022061300")
+
+export const Unilab = new Database(unilabCharts, "2022091300")
