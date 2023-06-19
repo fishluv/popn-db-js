@@ -60,9 +60,9 @@ export type SampleOptions = FilterOptions & { count?: number }
 
 class Database {
   private readonly allCharts: Array<ChartConstructorProps>
-  private readonly datecode: String
+  private readonly datecode: string
 
-  constructor(allCharts: Array<ChartConstructorProps>, datecode: String) {
+  constructor(allCharts: Array<ChartConstructorProps>, datecode: string) {
     this.allCharts = allCharts
     this.datecode = datecode
   }
