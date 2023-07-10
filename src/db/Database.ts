@@ -6,7 +6,7 @@ import isBuggedBpm from "./isBuggedBpm"
 import isHardestDifficultyForSong from "./isHardestDifficultyForSong"
 
 const kaimeiCharts: Array<ChartConstructorProps> = require("../../assets/2022061300.json")
-const unilabCharts: Array<ChartConstructorProps> = require("../../assets/2022091300.json")
+const unilabCharts: Array<ChartConstructorProps> = require("../../assets/2022122000.json")
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 function toNullableNumber(val: any): number | null {
@@ -276,4 +276,4 @@ class Database {
 
 export const Kaimei = new Database(kaimeiCharts, "2022061300")
 
-export const Unilab = new Database(unilabCharts, "2022091300")
+export const Unilab = new Database(unilabCharts, "2022122000")
