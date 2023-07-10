@@ -6,12 +6,12 @@ Node client for [popn-dbs](https://github.com/fishluv/popn-dbs).
 
 ```js
 // import
-import { Database } from "popn-db-js"
-Database.sampleQueriedCharts({ count: 5, query: "ver=27,lv=45" })
+import { Unilab } from "popn-db-js"
+Unilab.sampleQueriedCharts({ count: 5, query: "ver=27,lv=45" })
 
 // require
 var PopnDb = require("popn-db-js")
-PopnDb.Database.sampleQueriedCharts({ count: 5, query: "ver=27,lv=45" })
+PopnDb.Unilab.sampleQueriedCharts({ count: 5, query: "ver=27,lv=45" })
 
 // output
 [
