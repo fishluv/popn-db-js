@@ -2,6 +2,18 @@
 
 Node client for [popn-dbs](https://github.com/fishluv/popn-dbs).
 
+## Development
+
+```sh
+yarn tsc --watch
+```
+
+```js
+// In node repl:
+var PopnDb = require(".")
+// See Usage
+```
+
 ## Usage
 
 ```js
