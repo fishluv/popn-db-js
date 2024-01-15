@@ -2,6 +2,7 @@ import Chart, { ChartConstructorProps } from "../models/Chart"
 import Difficulty, { parseDifficulty } from "../models/Difficulty"
 import SranLevel from "../models/SranLevel"
 import ConditionSet from "./ConditionSet"
+import hasBpmChanges from "./hasBpmChanges"
 import isBuggedBpm from "./isBuggedBpm"
 import isHardestDifficultyForSong from "./isHardestDifficultyForSong"
 
@@ -53,6 +54,7 @@ export interface FilterOptions {
   hardest?: IncludeOption
   floorInfection?: IncludeOption
   buggedBpms?: IncludeOption
+  bpmChanges?: IncludeOption
   livelyPacks?: IncludeOption
 }
 
@@ -106,6 +108,7 @@ class Database {
     hardest = "include",
     floorInfection = "include",
     buggedBpms = "include",
+    bpmChanges = "include",
     livelyPacks = "include",
   }: FilterOptions = {}): Chart[] => {
     // Only filter by rating if ratingMin or ratingMax is present.
@@ -182,6 +185,13 @@ class Database {
           return false
         }
         if (buggedBpms === "only" && !isBuggedBpm(bpm)) {
+          return false
+        }
+
+        if (bpmChanges === "exclude" && hasBpmChanges(bpm)) {
+          return false
+        }
+        if (bpmChanges === "only" && !hasBpmChanges(bpm)) {
           return false
         }
 

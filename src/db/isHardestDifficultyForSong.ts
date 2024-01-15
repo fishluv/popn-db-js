@@ -1,6 +1,7 @@
 import { ChartConstructorProps } from "../models/Chart"
 import Difficulty, { DIFFICULTIES, parseDifficulty } from "../models/Difficulty"
 
+// TODO fix
 const allCharts: Array<ChartConstructorProps> = require("../../assets/2022061300.json")
 
 export default function isHardestDifficultyForSong(

@@ -10,6 +10,7 @@ import SranLevel, {
 } from "../models/SranLevel"
 import isBuggedBpm from "./isBuggedBpm"
 import isHardestDifficultyForSong from "./isHardestDifficultyForSong"
+import hasBpmChanges from "./hasBpmChanges"
 
 type EqualityOperator = "=" | "!="
 type NumericalOperator = "=" | "!=" | ">" | ">=" | "<" | "<="
@@ -319,6 +320,8 @@ class DifficultyCondition extends Condition {
 // Suspending Lively support indefinitely.
 type Identifier =
   | "buggedbpm"
+  | "bpmchanges"
+  | "soflan"
   | "hardest"
   | "holds"
   | "floorinfection"
@@ -327,7 +330,7 @@ type Identifier =
 type IdentifierConditionValue = Identifier | `!${Identifier}`
 
 /**
- * buggedbpm, hardest, holds, floorinfection, upper, ura
+ * buggedbpm, bpmchanges, soflan, hardest, holds, floorinfection, upper, ura
  */
 class IdentifierCondition extends Condition {
   static isValid(tokens: string[]): tokens is [IdentifierConditionValue] {
@@ -345,6 +348,10 @@ class IdentifierCondition extends Condition {
     return [
       "buggedbpm",
       "!buggedbpm",
+      "bpmchanges",
+      "!bpmchanges",
+      "soflan",
+      "!soflan",
       "hardest",
       "!hardest",
       "holds",
@@ -371,6 +378,12 @@ class IdentifierCondition extends Condition {
         return isBuggedBpm(chart.bpm)
       case "!buggedbpm":
         return !isBuggedBpm(chart.bpm)
+      case "bpmchanges":
+      case "soflan":
+        return hasBpmChanges(chart.bpm)
+      case "!bpmchanges":
+      case "!soflan":
+        return !hasBpmChanges(chart.bpm)
       case "hardest":
         return isHardestDifficultyForSong(
           parseDifficulty(chart.difficulty),
