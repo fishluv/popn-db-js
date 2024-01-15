@@ -208,9 +208,14 @@ class Database {
           return false
         }
 
+        // TODO: Support hardest=exclude?
         if (
           hardest === "only" &&
-          !isHardestDifficultyForSong(parseDifficulty(difficulty), songId)
+          !isHardestDifficultyForSong(
+            parseDifficulty(difficulty),
+            songId,
+            this.allCharts,
+          )
         ) {
           // Put this last because it's expensive.
           return false
@@ -237,7 +242,7 @@ class Database {
   queryCharts = (query = ""): Chart[] => {
     const conditionSet = ConditionSet.fromQuery(query)
     const matchingRecords = this.allCharts.filter(chart =>
-      conditionSet.isSatisfiedByChart(chart),
+      conditionSet.isSatisfiedByChart(chart, this.allCharts),
     )
     return matchingRecords.map(Database.recordToChart)
   }

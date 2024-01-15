@@ -49,7 +49,10 @@ abstract class Condition {
     throw new Error(`Invalid condition: [${condStr}]: tokenized as [${tokens}]`)
   }
 
-  abstract isSatisfiedByChart(chart: ChartConstructorProps): boolean
+  abstract isSatisfiedByChart(
+    chart: ChartConstructorProps,
+    allCharts: Array<ChartConstructorProps>,
+  ): boolean
 }
 
 /**
@@ -372,7 +375,10 @@ class IdentifierCondition extends Condition {
     this.value = value
   }
 
-  isSatisfiedByChart(chart: ChartConstructorProps): boolean {
+  isSatisfiedByChart(
+    chart: ChartConstructorProps,
+    allCharts: Array<ChartConstructorProps>,
+  ): boolean {
     switch (this.value) {
       case "buggedbpm":
         return isBuggedBpm(chart.bpm)
@@ -388,11 +394,13 @@ class IdentifierCondition extends Condition {
         return isHardestDifficultyForSong(
           parseDifficulty(chart.difficulty),
           chart.songId,
+          allCharts,
         )
       case "!hardest":
         return !isHardestDifficultyForSong(
           parseDifficulty(chart.difficulty),
           chart.songId,
+          allCharts,
         )
       case "holds":
         return chart.hasHolds
@@ -483,13 +491,16 @@ export default class ConditionSet {
     this.conditions = conditions
   }
 
-  isSatisfiedByChart(chart: ChartConstructorProps): boolean {
+  isSatisfiedByChart(
+    chart: ChartConstructorProps,
+    allCharts: Array<ChartConstructorProps>,
+  ): boolean {
     if (!this.conditions.length) {
       return false
     }
 
     return this.conditions.every(condition =>
-      condition.isSatisfiedByChart(chart),
+      condition.isSatisfiedByChart(chart, allCharts),
     )
   }
 }
