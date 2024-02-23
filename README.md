@@ -19,6 +19,10 @@ var PopnDb = require(".")
 // See Usage
 ```
 
+```sh
+yarn publish
+```
+
 ## Usage
 
 ```js
