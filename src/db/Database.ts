@@ -6,9 +6,6 @@ import hasBpmChanges from "./hasBpmChanges"
 import isBuggedBpm from "./isBuggedBpm"
 import isHardestDifficultyForSong from "./isHardestDifficultyForSong"
 
-const kaimeiCharts: Array<ChartConstructorProps> = require("../../assets/2022061300.json")
-const unilabCharts: Array<ChartConstructorProps> = require("../../assets/2023090500.json")
-
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 function toNullableNumber(val: any): number | null {
   if (val === null) {
@@ -282,13 +279,15 @@ class Database {
       rating: toNullableNumber(chartRec["rating"]),
       sranLevel: chartRec["sranLevel"] as string | null,
       songLabels: chartRec["songLabels"] as string[],
-      remyWikiPath: chartRec["remyWikiPath"] as string,
+      remywikiPath: chartRec["remywikiPath"] as string,
       songSlug: chartRec["songSlug"] as string,
-      hyrorrePath: chartRec["hyrorrePath"] as string | null,
+      jkwikiPath: chartRec["jkwikiPath"] as string | null,
     })
   }
 }
 
-export const Kaimei = new Database(kaimeiCharts, "2022061300")
+const unilab0411Charts: Array<ChartConstructorProps> = require("../../assets/2023041100.json")
+const unilab1218Charts: Array<ChartConstructorProps> = require("../../assets/2023121800.json")
 
-export const Unilab = new Database(unilabCharts, "2023090500")
+export const Unilab0411 = new Database(unilab0411Charts, "2023041100")
+export const Unilab1218 = new Database(unilab1218Charts, "2023121800")

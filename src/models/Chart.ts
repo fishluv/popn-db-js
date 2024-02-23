@@ -19,9 +19,9 @@ export interface ChartConstructorProps {
   rating: number | null
   sranLevel: string | null
   songLabels: string[]
-  remyWikiPath: string
+  remywikiPath: string
   songSlug: string
-  hyrorrePath: string | null
+  jkwikiPath: string | null
 }
 
 export default class Chart {
@@ -41,9 +41,9 @@ export default class Chart {
   readonly rating: number | null
   readonly sranLevel: string | null
   readonly songLabels: string[]
-  readonly remyWikiUrl: string
+  readonly remywikiPath: string
   readonly songSlug: string
-  readonly hyrorreUrl: string | null
+  readonly jkwikiPath: string | null
 
   constructor({
     id,
@@ -62,10 +62,26 @@ export default class Chart {
     rating,
     sranLevel,
     songLabels,
-    remyWikiPath,
+    remywikiPath,
     songSlug,
-    hyrorrePath,
+    jkwikiPath,
   }: ChartConstructorProps) {
+    if (!id) throw new Error("missing id")
+    if (!songId) throw new Error(`chart ${id} missing songId`)
+    if (!songFolder) throw new Error(`chart ${id} missing songFolder`)
+    if (!difficulty) throw new Error(`chart ${id} missing difficulty`)
+    if (!level) throw new Error(`chart ${id} missing level`)
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    if ([null, undefined].includes(hasHolds as any))
+      throw new Error(`chart ${id} missing hasHolds`)
+    if (!title) throw new Error(`chart ${id} missing title`)
+    if (!genre) throw new Error(`chart ${id} missing genre`)
+    if (!titleSortChar) throw new Error(`chart ${id} missing titleSortChar`)
+    if (!genreSortChar) throw new Error(`chart ${id} missing genreSortChar`)
+    if (!songLabels) throw new Error(`chart ${id} missing songLabels`)
+    if (!remywikiPath) throw new Error(`chart ${id} missing remywikiPath`)
+    if (!songSlug) throw new Error(`chart ${id} missing songSlug`)
+
     this.id = id
     this.songId = songId
     this.songFolder = parseVersionFolder(songFolder)
@@ -82,11 +98,8 @@ export default class Chart {
     this.rating = rating
     this.sranLevel = sranLevel
     this.songLabels = songLabels
-    this.remyWikiUrl = `https://remywiki.com/${remyWikiPath}`
+    this.remywikiPath = remywikiPath
     this.songSlug = songSlug
-    this.hyrorreUrl =
-      hyrorrePath === null
-        ? null
-        : `https://popn.wiki/%E9%9B%A3%E6%98%93%E5%BA%A6%E8%A1%A8/${hyrorrePath}`
+    this.jkwikiPath = jkwikiPath
   }
 }
