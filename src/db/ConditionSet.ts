@@ -215,6 +215,9 @@ class LevelEmhCondition extends Condition {
     if (level < targetLevel) {
       return false
     }
+    if (level > targetLevel) {
+      return true
+    }
 
     switch (targetEmh) {
       case "e":
@@ -232,6 +235,9 @@ class LevelEmhCondition extends Condition {
     targetLevel: number,
     targetEmh: "e" | "m" | "h",
   ) {
+    if (level < targetLevel) {
+      return true
+    }
     if (level > targetLevel) {
       return false
     }
