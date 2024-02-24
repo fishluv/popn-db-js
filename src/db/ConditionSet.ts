@@ -20,7 +20,7 @@ type NumericalOperator = "=" | "!=" | ">" | ">=" | "<" | "<="
 //   "2a" will get matched as "2" and "a"
 //   etc.
 const TOKEN_REGEX =
-  /(!=|>=|<=|=|>|<|0?(1|2)(a|-|弱|b|\+|強)|(cs|\d{2})+|!?[a-z]+|[+-\d.]+)/g
+  /(!=|>=|<=|=|>|<|0?(1|2)(a|-|弱|b|\+|強)|\d{2}[emh]|(cs|\d{2})+|!?[a-z]+|[+-\d.]+)/g
 
 abstract class Condition {
   static fromString(condStr: string): Condition {
@@ -34,6 +34,8 @@ abstract class Condition {
       return new FalseCondition()
     } else if (LevelCondition.isValid(tokens)) {
       return LevelCondition.fromTokens(tokens)
+    } else if (LevelEmhCondition.isValid(tokens)) {
+      return LevelEmhCondition.fromTokens(tokens)
     } else if (RatingCondition.isValid(tokens)) {
       return RatingCondition.fromTokens(tokens)
     } else if (SranLevelCondition.isValid(tokens)) {
@@ -137,6 +139,152 @@ class LevelCondition extends Condition {
         return chartValue < this.value
       case "<=":
         return chartValue <= this.value
+    }
+  }
+}
+
+/**
+ * lv = 40h   // Matches charts that are level 40 and rated +0.5 or higher.
+ * lv >= 40h  // Matches charts that are level 40 and rated +0.5 or higher; also matches all charts level 41 or higher.
+ */
+class LevelEmhCondition extends Condition {
+  static isValid(
+    tokens: string[],
+  ): tokens is ["lv", NumericalOperator, string] {
+    if (tokens.length === 3) {
+      const [field, operator, value] = tokens
+      return (
+        field === "lv" &&
+        this.isValidOperator(operator) &&
+        this.isValidValue(value)
+      )
+    }
+    return false
+  }
+
+  static fromTokens(tokens: ["lv", NumericalOperator, string]) {
+    const [_, operator, value] = tokens
+    const valueMatch = value.match(/(\d{2})([emh])/)
+    const [lv, emh] = [
+      Number(valueMatch![1]),
+      valueMatch![2] as "e" | "m" | "h",
+    ]
+    return new LevelEmhCondition(operator as "=" | ">=" | "<=", lv, emh)
+  }
+
+  private static isValidOperator(operator: string) {
+    return ["=", ">=", "<="].includes(operator)
+  }
+
+  private static isValidValue(value: string) {
+    const lv = value.split(/[emh]/)[0]
+    // No ratings for 28 and below
+    return /\d{1,2}/.test(lv) && this.between(Number(lv), 29, 50)
+  }
+
+  private static between(n: number, a: number, b: number) {
+    return n >= a && n <= b
+  }
+
+  private static levelEquals(
+    level: number,
+    rating: number,
+    targetLevel: number,
+    targetEmh: "e" | "m" | "h",
+  ) {
+    if (level !== targetLevel) {
+      return false
+    }
+
+    switch (targetEmh) {
+      case "e":
+        return rating <= -0.5
+      case "m":
+        return rating > -0.5 && rating < 0.5
+      case "h":
+        return rating >= 0.5
+    }
+  }
+
+  private static levelGte(
+    level: number,
+    rating: number,
+    targetLevel: number,
+    targetEmh: "e" | "m" | "h",
+  ) {
+    if (level < targetLevel) {
+      return false
+    }
+
+    switch (targetEmh) {
+      case "e":
+        return true
+      case "m":
+        return rating > -0.5
+      case "h":
+        return rating >= 0.5
+    }
+  }
+
+  private static levelLte(
+    level: number,
+    rating: number,
+    targetLevel: number,
+    targetEmh: "e" | "m" | "h",
+  ) {
+    if (level > targetLevel) {
+      return false
+    }
+
+    switch (targetEmh) {
+      case "e":
+        return rating <= -0.5
+      case "m":
+        return rating < 0.5
+      case "h":
+        return true
+    }
+  }
+
+  readonly operator: "=" | ">=" | "<="
+  readonly targetLevel: number
+  readonly targetEmh: "e" | "m" | "h"
+
+  constructor(operator: "=" | ">=" | "<=", lv: number, emh: "e" | "m" | "h") {
+    super()
+    this.operator = operator
+    this.targetLevel = lv
+    this.targetEmh = emh
+  }
+
+  isSatisfiedByChart(chart: ChartConstructorProps): boolean {
+    const { level, rating } = chart
+    if (rating === null) {
+      return false
+    }
+
+    switch (this.operator) {
+      case "=":
+        return LevelEmhCondition.levelEquals(
+          level,
+          rating,
+          this.targetLevel,
+          this.targetEmh,
+        )
+      case ">=":
+        return LevelEmhCondition.levelGte(
+          level,
+          rating,
+          this.targetLevel,
+          this.targetEmh,
+        )
+      case "<=":
+        return LevelEmhCondition.levelLte(
+          level,
+          rating,
+          this.targetLevel,
+          this.targetEmh,
+        )
     }
   }
 }
