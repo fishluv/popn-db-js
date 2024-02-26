@@ -178,8 +178,7 @@ class LevelEmhCondition extends Condition {
 
   private static isValidValue(value: string) {
     const lv = value.split(/[emh]/)[0]
-    // No ratings for 28 and below
-    return /\d{1,2}/.test(lv) && this.between(Number(lv), 29, 50)
+    return /\d{1,2}/.test(lv) && this.between(Number(lv), 1, 50)
   }
 
   private static between(n: number, a: number, b: number) {
