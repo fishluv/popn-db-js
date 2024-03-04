@@ -3,6 +3,7 @@
   "compilerOptions": {
     "rootDir": "src",
     "outDir": "build",
+    "lib": ["es2019"],
     "skipLibCheck": true
   },
   "include": [

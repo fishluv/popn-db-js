@@ -20,7 +20,7 @@ type NumericalOperator = "=" | "!=" | ">" | ">=" | "<" | "<="
 //   "2a" will get matched as "2" and "a"
 //   etc.
 const TOKEN_REGEX =
-  /(!=|>=|<=|=|>|<|0?(1|2)(a|-|弱|b|\+|強)|\d{2}[emh]|(cs|\d{2})+|!?[a-z]+|[+-\d.]+)/g
+  /(!=|>=|<=|=|>|<|0?(1|2)(a|-|弱|b|\+|強)|\d{2}[emh]|(cs|\d{2})+|[+-]?[a-z]+|[+-\d.]+)/g
 
 abstract class Condition {
   static fromString(condStr: string): Condition {
@@ -51,6 +51,8 @@ abstract class Condition {
     throw new Error(`Invalid condition: [${condStr}]: tokenized as [${tokens}]`)
   }
 
+  abstract readonly type: string
+
   abstract isSatisfiedByChart(
     chart: ChartConstructorProps,
     allCharts: Array<ChartConstructorProps>,
@@ -73,6 +75,8 @@ class FalseCondition extends Condition {
     }
     return false
   }
+
+  type = "false"
 
   isSatisfiedByChart(): boolean {
     return false
@@ -113,6 +117,8 @@ class LevelCondition extends Condition {
   private static between(n: number, a: number, b: number) {
     return n >= a && n <= b
   }
+
+  type = "level"
 
   readonly operator: NumericalOperator
   readonly value: number
@@ -251,6 +257,8 @@ class LevelEmhCondition extends Condition {
     }
   }
 
+  type = "levelemh"
+
   readonly operator: "=" | ">=" | "<="
   readonly targetLevel: number
   readonly targetEmh: "e" | "m" | "h"
@@ -325,6 +333,8 @@ class RatingCondition extends Condition {
     return !isNaN(parseFloat(value))
   }
 
+  type = "rating"
+
   readonly operator: NumericalOperator
   readonly value: number
 
@@ -389,6 +399,8 @@ class SranLevelCondition extends Condition {
     return isValidSranLevel(value)
   }
 
+  type = "sranlevel"
+
   readonly operator: NumericalOperator
   readonly value: SranLevel
 
@@ -452,6 +464,8 @@ class DifficultyCondition extends Condition {
     return /^[enhx]+$/.test(value)
   }
 
+  type = "difficulty"
+
   readonly operator: EqualityOperator
   readonly value: Difficulty[]
 
@@ -483,12 +497,14 @@ type Identifier =
   | "floorinfection"
   | "upper"
   | "ura"
-type IdentifierConditionValue = Identifier | `!${Identifier}`
+  | "omnimix"
+  | "lively"
+type IdentifierConditionValue = Identifier | `+${Identifier}` | `-${Identifier}`
 
 /**
- * buggedbpm, bpmchanges, soflan, hardest, holds, floorinfection, upper, ura
+ * Flag/identifier/label. See list above.
  */
-class IdentifierCondition extends Condition {
+export class IdentifierCondition extends Condition {
   static isValid(tokens: string[]): tokens is [IdentifierConditionValue] {
     if (tokens.length === 1) {
       return this.isValidValue(tokens[0])
@@ -503,23 +519,21 @@ class IdentifierCondition extends Condition {
   private static isValidValue(identifier: string) {
     return [
       "buggedbpm",
-      "!buggedbpm",
       "bpmchanges",
-      "!bpmchanges",
       "soflan",
-      "!soflan",
       "hardest",
-      "!hardest",
       "holds",
-      "!holds",
       "floorinfection",
-      "!floorinfection",
       "upper",
-      "!upper",
       "ura",
-      "!ura",
-    ].includes(identifier)
+      "omnimix",
+      "lively",
+    ]
+      .flatMap(id => [id, `+${id}`, `-${id}`])
+      .includes(identifier)
   }
+
+  type = "identifier"
 
   readonly value: IdentifierConditionValue
 
@@ -535,13 +549,13 @@ class IdentifierCondition extends Condition {
     switch (this.value) {
       case "buggedbpm":
         return isBuggedBpm(chart.bpm)
-      case "!buggedbpm":
+      case "-buggedbpm":
         return !isBuggedBpm(chart.bpm)
       case "bpmchanges":
       case "soflan":
         return hasBpmChanges(chart.bpm)
-      case "!bpmchanges":
-      case "!soflan":
+      case "-bpmchanges":
+      case "-soflan":
         return !hasBpmChanges(chart.bpm)
       case "hardest":
         return isHardestDifficultyForSong(
@@ -549,7 +563,7 @@ class IdentifierCondition extends Condition {
           chart.songId,
           allCharts,
         )
-      case "!hardest":
+      case "-hardest":
         return !isHardestDifficultyForSong(
           parseDifficulty(chart.difficulty),
           chart.songId,
@@ -557,20 +571,32 @@ class IdentifierCondition extends Condition {
         )
       case "holds":
         return chart.hasHolds
-      case "!holds":
+      case "-holds":
         return !chart.hasHolds
       case "floorinfection":
         return chart.songLabels.includes("floor_infection")
-      case "!floorinfection":
+      case "-floorinfection":
         return !chart.songLabels.includes("floor_infection")
       case "upper":
         return chart.songLabels.includes("upper")
-      case "!upper":
+      case "-upper":
         return !chart.songLabels.includes("upper")
       case "ura":
         return chart.songLabels.includes("ura")
-      case "!ura":
+      case "-ura":
         return !chart.songLabels.includes("ura")
+      case "omnimix":
+        return chart.songLabels.includes("omnimix")
+      case "-omnimix":
+        return !chart.songLabels.includes("omnimix")
+      case "lively":
+        return chart.songLabels.includes("lively")
+      case "-lively":
+        return !chart.songLabels.includes("lively")
+      default:
+        // +id is a no-op
+        // The reason +id exists is because omnimix and lively default to -id.
+        return true
     }
   }
 }
@@ -607,6 +633,8 @@ class VersionFolderCondition extends Condition {
   private static isValidValue(value: string) {
     return this.REGEX.test(value)
   }
+
+  type = "versionfolder"
 
   readonly operator: EqualityOperator
   readonly value: VersionFolder[]

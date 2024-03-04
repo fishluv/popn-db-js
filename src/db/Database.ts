@@ -1,7 +1,7 @@
 import Chart, { ChartConstructorProps } from "../models/Chart"
 import Difficulty, { parseDifficulty } from "../models/Difficulty"
 import SranLevel from "../models/SranLevel"
-import ConditionSet from "./ConditionSet"
+import ConditionSet, { IdentifierCondition } from "./ConditionSet"
 import hasBpmChanges from "./hasBpmChanges"
 import isBuggedBpm from "./isBuggedBpm"
 import isHardestDifficultyForSong from "./isHardestDifficultyForSong"
@@ -238,6 +238,27 @@ class Database {
 
   queryCharts = (query = ""): Chart[] => {
     const conditionSet = ConditionSet.fromQuery(query)
+
+    // Default to -omnimix.
+    const hasOmni = conditionSet.conditions.some(
+      cond =>
+        cond.type === "identifier" &&
+        ["omnimix", "+omnimix"].includes((cond as IdentifierCondition).value),
+    )
+    if (!hasOmni) {
+      conditionSet.conditions.push(new IdentifierCondition("-omnimix"))
+    }
+
+    // Default to -lively.
+    const hasLively = conditionSet.conditions.some(
+      cond =>
+        cond.type === "identifier" &&
+        ["lively", "+lively"].includes((cond as IdentifierCondition).value),
+    )
+    if (!hasLively) {
+      conditionSet.conditions.push(new IdentifierCondition("-lively"))
+    }
+
     const matchingRecords = this.allCharts.filter(chart =>
       conditionSet.isSatisfiedByChart(chart, this.allCharts),
     )

@@ -11,6 +11,9 @@ Supported datecodes:
 
 ```sh
 yarn tsc --watch
+
+# In another shell
+node
 ```
 
 ```js
