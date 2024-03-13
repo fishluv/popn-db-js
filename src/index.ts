@@ -6,6 +6,7 @@ import VersionFolder, {
   VERSION_FOLDERS,
   parseVersionFolder,
 } from "./models/VersionFolder"
+import OtherFolder from "./models/OtherFolder"
 
 export {
   Chart,
@@ -19,6 +20,7 @@ export {
   VersionFolder,
   VERSION_FOLDERS,
   parseVersionFolder,
+  OtherFolder,
 }
 
 export {
