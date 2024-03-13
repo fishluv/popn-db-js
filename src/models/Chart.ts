@@ -1,11 +1,13 @@
 import Difficulty, { parseDifficulty } from "./Difficulty"
+import OtherFolder, { parseOtherFolder } from "./OtherFolder"
 import VersionFolder, { parseVersionFolder } from "./VersionFolder"
 
 // Does not necessarily map 1-1 to Chart props.
 export interface ChartConstructorProps {
   id: string
   songId: string
-  songFolder: string
+  songDebut: string
+  songFolder: string | null
   difficulty: string
   level: number
   hasHolds: boolean
@@ -27,7 +29,8 @@ export interface ChartConstructorProps {
 export default class Chart {
   readonly id: string
   readonly songId: string
-  readonly songFolder: VersionFolder
+  readonly songDebut: string
+  readonly songFolder: VersionFolder | OtherFolder | null
   readonly difficulty: Difficulty
   readonly level: number
   readonly hasHolds: boolean
@@ -48,6 +51,7 @@ export default class Chart {
   constructor({
     id,
     songId,
+    songDebut,
     songFolder,
     difficulty,
     level,
@@ -68,7 +72,7 @@ export default class Chart {
   }: ChartConstructorProps) {
     if (!id) throw new Error("missing id")
     if (!songId) throw new Error(`chart ${id} missing songId`)
-    if (!songFolder) throw new Error(`chart ${id} missing songFolder`)
+    if (!songDebut) throw new Error(`chart ${id} missing songDebut`)
     if (!difficulty) throw new Error(`chart ${id} missing difficulty`)
     if (!level) throw new Error(`chart ${id} missing level`)
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -84,7 +88,9 @@ export default class Chart {
 
     this.id = id
     this.songId = songId
-    this.songFolder = parseVersionFolder(songFolder)
+    this.songDebut = songDebut
+    this.songFolder =
+      parseVersionFolder(songFolder) || parseOtherFolder(songFolder)
     this.difficulty = parseDifficulty(difficulty)
     this.level = level
     this.hasHolds = hasHolds

@@ -35,8 +35,10 @@ export const VERSION_FOLDERS = [
 type VersionFolder = typeof VERSION_FOLDERS[number]
 export default VersionFolder
 
-export function parseVersionFolder(s: string | null): VersionFolder {
-  const snorm = s?.toLowerCase().padStart(2, "0")
+export function parseVersionFolder(
+  s: string | undefined | null,
+): VersionFolder | null {
+  const snorm = s?.toLowerCase()?.padStart(2, "0")
   switch (snorm) {
     case "cs":
     case "01":
@@ -70,6 +72,6 @@ export function parseVersionFolder(s: string | null): VersionFolder {
     case "00":
       return "cs"
     default:
-      throw new Error(`Invalid version folder ${s}`)
+      return null
   }
 }

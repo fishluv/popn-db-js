@@ -5,7 +5,7 @@ Javascript client for [popn-dbs](https://github.com/fishluv/popn-dbs).
 Supported datecodes:
 
 - 2023041100 (Unilab)
-- 2023121800 (Unilab)
+- 2023121800 (Unilab + extras)
 
 ## Development
 
@@ -42,6 +42,7 @@ PopnDb.Unilab1218.sampleQueriedCharts({ count: 5, query: "ver=27,lv=45" })
   Chart {
     id: '2120ex',
     songId: '2120',
+    songDebut: '27',
     songFolder: '27',
     difficulty: 'ex',
     level: 45,

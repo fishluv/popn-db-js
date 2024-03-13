@@ -286,6 +286,7 @@ class Database {
     return new Chart({
       id: chartRec["id"] as string,
       songId: chartRec["songId"] as string,
+      songDebut: chartRec["songDebut"] as string,
       songFolder: chartRec["songFolder"] as string,
       difficulty: chartRec["difficulty"] as string,
       level: Number(chartRec["level"]),
@@ -308,7 +309,7 @@ class Database {
 }
 
 const unilab0411Charts: Array<ChartConstructorProps> = require("../../assets/2023041100.json")
-const unilab1218Charts: Array<ChartConstructorProps> = require("../../assets/2023121800.json")
+const unilab1218Charts: Array<ChartConstructorProps> = require("../../assets/2023121800.with_extras.json")
 
 export const Unilab0411 = new Database(unilab0411Charts, "2023041100")
 export const Unilab1218 = new Database(unilab1218Charts, "2023121800")

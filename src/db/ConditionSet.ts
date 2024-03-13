@@ -487,7 +487,6 @@ class DifficultyCondition extends Condition {
   }
 }
 
-// Suspending Lively support indefinitely.
 type Identifier =
   | "buggedbpm"
   | "bpmchanges"
@@ -590,9 +589,9 @@ export class IdentifierCondition extends Condition {
       case "-omnimix":
         return !chart.songLabels.includes("omnimix")
       case "lively":
-        return chart.songLabels.includes("lively")
+        return chart.songDebut === "cslively"
       case "-lively":
-        return !chart.songLabels.includes("lively")
+        return chart.songDebut !== "cslively"
       default:
         // +id is a no-op
         // The reason +id exists is because omnimix and lively default to -id.
@@ -644,11 +643,14 @@ class VersionFolderCondition extends Condition {
     this.operator = operator
     this.value = value
       .match(VersionFolderCondition.REGEX)!
-      .map(parseVersionFolder)
+      .map(val => parseVersionFolder(val)!)
   }
 
   isSatisfiedByChart(chart: ChartConstructorProps): boolean {
     const chartValue = parseVersionFolder(chart.songFolder)
+    if (chartValue === null) {
+      return false
+    }
 
     if (this.operator === "=") {
       return this.value.includes(chartValue)
