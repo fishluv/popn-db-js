@@ -496,6 +496,7 @@ type Identifier =
   | "floorinfection"
   | "upper"
   | "ura"
+  | "eemall"
   | "omnimix"
   | "lively"
 type IdentifierConditionValue = Identifier | `+${Identifier}` | `-${Identifier}`
@@ -525,6 +526,7 @@ export class IdentifierCondition extends Condition {
       "floorinfection",
       "upper",
       "ura",
+      "eemall",
       "omnimix",
       "lively",
     ]
@@ -584,6 +586,10 @@ export class IdentifierCondition extends Condition {
         return chart.songLabels.includes("ura")
       case "-ura":
         return !chart.songLabels.includes("ura")
+      case "eemall":
+        return chart.songDebut === "eemall"
+      case "-eemall":
+        return chart.songDebut !== "eemall"
       case "omnimix":
         return chart.songLabels.includes("omnimix")
       case "-omnimix":
