@@ -10,6 +10,7 @@ Supported datecodes:
 ## Development
 
 ```sh
+nvm use
 yarn tsc --watch
 
 # In another shell
