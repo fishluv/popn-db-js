@@ -1,111 +1,119 @@
+import { RawChart } from "../db/Database"
 import Difficulty, { parseDifficulty } from "./Difficulty"
-import OtherFolder, { parseOtherFolder } from "./OtherFolder"
-import VersionFolder, { parseVersionFolder } from "./VersionFolder"
-
-// Does not necessarily map 1-1 to Chart props.
-export interface ChartConstructorProps {
-  id: string
-  songId: string
-  songDebut: string
-  songFolder: string | null
-  difficulty: string
-  level: number
-  hasHolds: boolean
-  title: string
-  genre: string
-  titleSortChar: string
-  genreSortChar: string
-  bpm: string | null
-  duration: number | null
-  notes: number | null
-  rating: number | null
-  sranLevel: string | null
-  songLabels: string[]
-  remywikiPath: string
-  songSlug: string
-  jkwikiPath: string | null
-}
 
 export default class Chart {
   readonly id: string
-  readonly songId: string
-  readonly songDebut: string
-  readonly songFolder: VersionFolder | OtherFolder | null
+  readonly songId: number
   readonly difficulty: Difficulty
   readonly level: number
-  readonly hasHolds: boolean
-  readonly title: string
-  readonly genre: string
-  readonly titleSortChar: string
-  readonly genreSortChar: string
-  readonly bpm: string | null
-  readonly duration: number | null
-  readonly notes: number | null
-  readonly rating: number | null
-  readonly sranLevel: string | null
-  readonly songLabels: string[]
-  readonly remywikiPath: string
-  readonly songSlug: string
+  readonly bpm: string
+  readonly mainBpm: number
+  readonly bpmType: string
+  readonly bpmSteps: number[]
+  readonly duration: number
+  readonly notes: number
+  readonly holdNotes: number
+  readonly timing: string
+  readonly timingSteps: number[][]
   readonly jkwikiPath: string | null
+  readonly rating: string | null
+  readonly sranLevel: string | null
+  readonly title: string
+  readonly fwTitle: string
+  readonly rTitle: string
+  readonly genre: string
+  readonly fwGenre: string
+  readonly rGenre: string
+  readonly artist: string
+  readonly rChara: string
+  readonly debut: string
+  readonly folders: string[]
+  readonly slug: string
+  readonly remywikiPath: string
+  readonly songLabels: string[]
 
   constructor({
     id,
-    songId,
-    songDebut,
-    songFolder,
-    difficulty,
-    level,
-    hasHolds,
-    title,
-    genre,
-    titleSortChar,
-    genreSortChar,
-    bpm,
-    duration,
+    sid,
+    diff,
+    lv,
+    bpm: { disp, steps: bpmSteps, main, type: bpmType },
+    dur,
     notes,
-    rating,
-    sranLevel,
-    songLabels,
-    remywikiPath,
-    songSlug,
-    jkwikiPath,
-  }: ChartConstructorProps) {
-    if (!id) throw new Error("missing id")
-    if (!songId) throw new Error(`chart ${id} missing songId`)
-    if (!songDebut) throw new Error(`chart ${id} missing songDebut`)
-    if (!difficulty) throw new Error(`chart ${id} missing difficulty`)
-    if (!level) throw new Error(`chart ${id} missing level`)
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    if ([null, undefined].includes(hasHolds as any))
-      throw new Error(`chart ${id} missing hasHolds`)
+    holds,
+    tim: { steps: timingSteps, type: timingType },
+    jk: { path: jkwikiPath, rating, srlv },
+    title,
+    fwTitle,
+    rTitle,
+    genre,
+    fwGenre,
+    rGenre,
+    artist,
+    rChara,
+    debut,
+    folders,
+    slug,
+    remyPath,
+    labels,
+  }: RawChart) {
+    if (!id) throw new Error("missing chart id")
+    if (sid === undefined || sid === null)
+      throw new Error(`chart ${id} missing sid`)
+    if (!diff) throw new Error(`chart ${id} missing diff`)
+    if (!lv) throw new Error(`chart ${id} missing lv`)
+    if (!disp) throw new Error(`chart ${id} missing disp`)
+    if (!bpmSteps) throw new Error(`chart ${id} missing bpmSteps`)
+    if (!main) throw new Error(`chart ${id} missing main`)
+    if (!bpmType) throw new Error(`chart ${id} missing bpmType`)
+    if (!dur) throw new Error(`chart ${id} missing dur`)
+    if (!notes) throw new Error(`chart ${id} missing notes`)
+    if (holds === undefined || holds === null)
+      throw new Error(`chart ${id} missing holds`)
+    if (!timingSteps) throw new Error(`chart ${id} missing timingSteps`)
+    if (!timingType) throw new Error(`chart ${id} missing timingType`)
     if (!title) throw new Error(`chart ${id} missing title`)
+    if (!fwTitle) throw new Error(`chart ${id} missing fwTitle`)
+    if (!rTitle) throw new Error(`chart ${id} missing rTitle`)
     if (!genre) throw new Error(`chart ${id} missing genre`)
-    if (!titleSortChar) throw new Error(`chart ${id} missing titleSortChar`)
-    if (!genreSortChar) throw new Error(`chart ${id} missing genreSortChar`)
-    if (!songLabels) throw new Error(`chart ${id} missing songLabels`)
-    if (!remywikiPath) throw new Error(`chart ${id} missing remywikiPath`)
-    if (!songSlug) throw new Error(`chart ${id} missing songSlug`)
+    if (!fwGenre) throw new Error(`chart ${id} missing fwGenre`)
+    if (!rGenre) throw new Error(`chart ${id} missing rGenre`)
+    if (!artist) throw new Error(`chart ${id} missing artist`)
+    if (!rChara) throw new Error(`chart ${id} missing rChara`)
+    if (!debut) throw new Error(`chart ${id} missing debut`)
+    if (!folders) throw new Error(`chart ${id} missing folders`)
+    if (!slug) throw new Error(`chart ${id} missing slug`)
+    if (!remyPath) throw new Error(`chart ${id} missing remyPath`)
+    if (!labels) throw new Error(`chart ${id} missing labels`)
 
     this.id = id
-    this.songId = songId
-    this.songDebut = songDebut
-    this.songFolder =
-      parseVersionFolder(songFolder) || parseOtherFolder(songFolder)
-    this.difficulty = parseDifficulty(difficulty)
-    this.level = level
-    this.hasHolds = hasHolds
-    this.title = title
-    this.genre = genre
-    this.titleSortChar = titleSortChar
-    this.genreSortChar = genreSortChar
-    this.bpm = bpm
-    this.duration = duration
+    this.songId = sid
+    this.difficulty = parseDifficulty(diff)
+    this.level = lv
+    this.bpm = disp
+    this.bpmSteps = bpmSteps
+    this.mainBpm = main
+    this.bpmType = bpmType
+    this.duration = dur
     this.notes = notes
-    this.rating = rating
-    this.sranLevel = sranLevel
-    this.songLabels = songLabels
-    this.remywikiPath = remywikiPath
-    this.songSlug = songSlug
+    this.holdNotes = holds
+    this.timing = timingType
+    this.timingSteps = timingSteps
     this.jkwikiPath = jkwikiPath
+    this.rating = rating
+    this.sranLevel = srlv
+    this.title = title
+    this.fwTitle = fwTitle
+    this.rTitle = rTitle
+    this.genre = genre
+    this.fwGenre = fwGenre
+    this.rGenre = rGenre
+    this.artist = artist
+    this.rChara = rChara
+    this.debut = debut
+    this.folders = folders
+    this.slug = slug
+    this.remywikiPath = remyPath
+    this.songLabels = labels
   }
 }

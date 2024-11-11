@@ -1,16 +1,13 @@
-import { ChartConstructorProps } from "../models/Chart"
 import Difficulty, { parseDifficulty } from "../models/Difficulty"
-import VersionFolder, {
-  parseVersionFolder,
-  VERSION_FOLDERS,
-} from "../models/VersionFolder"
 import SranLevel, {
   isValidSranLevel,
   parseSranLevel,
 } from "../models/SranLevel"
-import isBuggedBpm from "./isBuggedBpm"
+import hasBuggedBpm from "./hasBuggedBpm"
 import isHardestDifficultyForSong from "./isHardestDifficultyForSong"
-import hasBpmChanges from "./hasBpmChanges"
+import Chart from "../models/Chart"
+import VersionFolder, { parseVersionFolder } from "../models/VersionFolder"
+import BemaniFolder, { parseBemaniFolder } from "../models/BemaniFolder"
 
 type EqualityOperator = "=" | "!="
 type NumericalOperator = "=" | "!=" | ">" | ">=" | "<" | "<="
@@ -20,7 +17,7 @@ type NumericalOperator = "=" | "!=" | ">" | ">=" | "<" | "<="
 //   "2a" will get matched as "2" and "a"
 //   etc.
 const TOKEN_REGEX =
-  /(!=|>=|<=|=|>|<|0?(1|2)(a|-|弱|b|\+|強)|\d{2}[emh]|(cs|\d{2})+|[+-]?[a-z]+|[+-\d.]+)/g
+  /(!=|>=|<=|=|>|<|0?(1|2)(a|b)|\d{1,2}[emh]|(cs|\d{2})+|[+-]?[a-z]+|[+-\d.]+)/g
 
 abstract class Condition {
   static fromString(condStr: string): Condition {
@@ -44,8 +41,8 @@ abstract class Condition {
       return DifficultyCondition.fromTokens(tokens)
     } else if (IdentifierCondition.isValid(tokens)) {
       return IdentifierCondition.fromTokens(tokens)
-    } else if (VersionFolderCondition.isValid(tokens)) {
-      return VersionFolderCondition.fromTokens(tokens)
+    } else if (FolderCondition.isValid(tokens)) {
+      return FolderCondition.fromTokens(tokens)
     }
 
     throw new Error(`Invalid condition: [${condStr}]: tokenized as [${tokens}]`)
@@ -53,16 +50,13 @@ abstract class Condition {
 
   abstract readonly type: string
 
-  abstract isSatisfiedByChart(
-    chart: ChartConstructorProps,
-    allCharts: Array<ChartConstructorProps>,
-  ): boolean
+  abstract isSatisfiedByChart(chart: Chart, allCharts: Array<Chart>): boolean
 }
 
 /**
  * Conditions that match no charts:
  *  "diff ="
- *  "ver ="
+ *  "folder ="
  */
 class FalseCondition extends Condition {
   static isValid(tokens: string[]) {
@@ -70,7 +64,7 @@ class FalseCondition extends Condition {
       const [first, second] = tokens
       return (
         (first === "diff" && second === "=") ||
-        (first === "ver" && second === "=")
+        (first === "folder" && second === "=")
       )
     }
     return false
@@ -129,7 +123,7 @@ class LevelCondition extends Condition {
     this.value = Number(value)
   }
 
-  isSatisfiedByChart(chart: ChartConstructorProps): boolean {
+  isSatisfiedByChart(chart: Chart): boolean {
     const chartValue = chart.level
 
     switch (this.operator) {
@@ -170,7 +164,7 @@ class LevelEmhCondition extends Condition {
 
   static fromTokens(tokens: ["lv", NumericalOperator, string]) {
     const [_, operator, value] = tokens
-    const valueMatch = value.match(/(\d{2})([emh])/)
+    const valueMatch = value.match(/(\d{1,2})([emh])/)
     const [lv, emh] = [
       Number(valueMatch![1]),
       valueMatch![2] as "e" | "m" | "h",
@@ -270,31 +264,33 @@ class LevelEmhCondition extends Condition {
     this.targetEmh = emh
   }
 
-  isSatisfiedByChart(chart: ChartConstructorProps): boolean {
+  isSatisfiedByChart(chart: Chart): boolean {
     const { level, rating } = chart
     if (rating === null) {
       return false
     }
 
+    const ratingNum = Number(rating)
+
     switch (this.operator) {
       case "=":
         return LevelEmhCondition.levelEquals(
           level,
-          rating,
+          ratingNum,
           this.targetLevel,
           this.targetEmh,
         )
       case ">=":
         return LevelEmhCondition.levelGte(
           level,
-          rating,
+          ratingNum,
           this.targetLevel,
           this.targetEmh,
         )
       case "<=":
         return LevelEmhCondition.levelLte(
           level,
-          rating,
+          ratingNum,
           this.targetLevel,
           this.targetEmh,
         )
@@ -344,11 +340,11 @@ class RatingCondition extends Condition {
     this.value = Number(value)
   }
 
-  isSatisfiedByChart(chart: ChartConstructorProps): boolean {
-    const chartValue = chart.rating
-    if (chartValue === null) {
+  isSatisfiedByChart(chart: Chart): boolean {
+    if (chart.rating === null) {
       return false
     }
+    const chartValue = Number(chart.rating)
 
     switch (this.operator) {
       // Need to stringify for (in)equality to account for loss of precision.
@@ -410,7 +406,7 @@ class SranLevelCondition extends Condition {
     this.value = parseSranLevel(value)
   }
 
-  isSatisfiedByChart(chart: ChartConstructorProps): boolean {
+  isSatisfiedByChart(chart: Chart): boolean {
     const chartValue = chart.sranLevel
     if (chartValue === null) {
       return false
@@ -475,7 +471,7 @@ class DifficultyCondition extends Condition {
     this.value = [...value].map(parseDifficulty)
   }
 
-  isSatisfiedByChart(chart: ChartConstructorProps): boolean {
+  isSatisfiedByChart(chart: Chart): boolean {
     const chartValue = parseDifficulty(chart.difficulty)
 
     switch (this.operator) {
@@ -543,21 +539,18 @@ export class IdentifierCondition extends Condition {
     this.value = value
   }
 
-  isSatisfiedByChart(
-    chart: ChartConstructorProps,
-    allCharts: Array<ChartConstructorProps>,
-  ): boolean {
+  isSatisfiedByChart(chart: Chart, allCharts: Array<Chart>): boolean {
     switch (this.value) {
       case "buggedbpm":
-        return isBuggedBpm(chart.bpm)
+        return hasBuggedBpm(chart.bpmSteps)
       case "-buggedbpm":
-        return !isBuggedBpm(chart.bpm)
+        return !hasBuggedBpm(chart.bpmSteps)
       case "bpmchanges":
       case "soflan":
-        return hasBpmChanges(chart.bpm)
+        return chart.bpmSteps.length > 1
       case "-bpmchanges":
       case "-soflan":
-        return !hasBpmChanges(chart.bpm)
+        return chart.bpmSteps.length === 1
       case "hardest":
         return isHardestDifficultyForSong(
           parseDifficulty(chart.difficulty),
@@ -571,9 +564,9 @@ export class IdentifierCondition extends Condition {
           allCharts,
         )
       case "holds":
-        return chart.hasHolds
+        return chart.holdNotes > 0
       case "-holds":
-        return !chart.hasHolds
+        return chart.holdNotes === 0
       case "floorinfection":
         return chart.songLabels.includes("floor_infection")
       case "-floorinfection":
@@ -587,17 +580,17 @@ export class IdentifierCondition extends Condition {
       case "-ura":
         return !chart.songLabels.includes("ura")
       case "eemall":
-        return chart.songDebut === "eemall"
+        return chart.debut === "eemall"
       case "-eemall":
-        return chart.songDebut !== "eemall"
+        return chart.debut !== "eemall"
       case "omnimix":
         return chart.songLabels.includes("omnimix")
       case "-omnimix":
         return !chart.songLabels.includes("omnimix")
       case "lively":
-        return chart.songDebut === "cslively"
+        return chart.debut === "cslively"
       case "-lively":
-        return chart.songDebut !== "cslively"
+        return chart.debut !== "cslively"
       default:
         // +id is a no-op
         // The reason +id exists is because omnimix and lively default to -id.
@@ -607,61 +600,50 @@ export class IdentifierCondition extends Condition {
 }
 
 /**
- * ver = cs0102030405
+ * folder = cs
+ * folder = 27
+ * folder = bemani
  */
-class VersionFolderCondition extends Condition {
-  static REGEX = new RegExp(VERSION_FOLDERS.join("|"), "g")
-
+class FolderCondition extends Condition {
   static isValid(
     tokens: string[],
-  ): tokens is ["ver", EqualityOperator, string] {
+  ): tokens is ["folder", EqualityOperator, string] {
     if (tokens.length === 3) {
       const [field, operator, value] = tokens
       return (
-        field === "ver" &&
+        field === "folder" &&
         this.isValidOperator(operator) &&
-        this.isValidValue(value)
+        !!(parseVersionFolder(value) || parseBemaniFolder(value))
       )
     }
     return false
   }
 
-  static fromTokens(tokens: ["ver", EqualityOperator, string]) {
+  static fromTokens(tokens: ["folder", EqualityOperator, string]) {
     const [_, operator, value] = tokens
-    return new VersionFolderCondition(operator, value)
+    return new FolderCondition(operator, value)
   }
 
   private static isValidOperator(operator: string) {
     return ["=", "!="].includes(operator)
   }
 
-  private static isValidValue(value: string) {
-    return this.REGEX.test(value)
-  }
-
   type = "versionfolder"
 
   readonly operator: EqualityOperator
-  readonly value: VersionFolder[]
+  readonly value: VersionFolder | BemaniFolder
 
   constructor(operator: EqualityOperator, value: string) {
     super()
     this.operator = operator
-    this.value = value
-      .match(VersionFolderCondition.REGEX)!
-      .map(val => parseVersionFolder(val)!)
+    this.value = (parseVersionFolder(value) || parseBemaniFolder(value))!
   }
 
-  isSatisfiedByChart(chart: ChartConstructorProps): boolean {
-    const chartValue = parseVersionFolder(chart.songFolder)
-    if (chartValue === null) {
-      return false
-    }
-
+  isSatisfiedByChart(chart: Chart): boolean {
     if (this.operator === "=") {
-      return this.value.includes(chartValue)
+      return chart.folders.includes(this.value)
     } else {
-      return !this.value.includes(chartValue)
+      return !chart.folders.includes(this.value)
     }
   }
 }
@@ -680,10 +662,7 @@ export default class ConditionSet {
     this.conditions = conditions
   }
 
-  isSatisfiedByChart(
-    chart: ChartConstructorProps,
-    allCharts: Array<ChartConstructorProps>,
-  ): boolean {
+  isSatisfiedByChart(chart: Chart, allCharts: Array<Chart>): boolean {
     if (!this.conditions.length) {
       return false
     }

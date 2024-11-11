@@ -32,11 +32,11 @@ yarn publish
 ```js
 // import
 import { Unilab1218 } from "popn-db-js"
-Unilab1218.sampleQueriedCharts({ count: 5, query: "ver=27,lv=45" })
+Unilab1218.sampleQueriedCharts({ count: 5, query: "folder=27,lv=45" })
 
 // require
 var PopnDb = require("popn-db-js")
-PopnDb.Unilab1218.sampleQueriedCharts({ count: 5, query: "ver=27,lv=45" })
+PopnDb.Unilab1218.sampleQueriedCharts({ count: 5, query: "folder=27,lv=45" })
 
 // output
 [
