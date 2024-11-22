@@ -13,6 +13,7 @@ export interface RawChart {
   sid: number
   diff: string
   lv: number
+  hardest: boolean
   bpm: {
     disp: string
     steps: number[]
@@ -29,7 +30,7 @@ export interface RawChart {
   jk: {
     path: string | null
     rating: string | null
-    srlv: string | null
+    srlv: number | null
   }
   title: string
   fwTitle: string

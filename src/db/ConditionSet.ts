@@ -1,23 +1,22 @@
 import Difficulty, { parseDifficulty } from "../models/Difficulty"
-import SranLevel, {
-  isValidSranLevel,
-  parseSranLevel,
-} from "../models/SranLevel"
 import hasBuggedBpm from "./hasBuggedBpm"
 import isHardestDifficultyForSong from "./isHardestDifficultyForSong"
 import Chart from "../models/Chart"
 import VersionFolder, { parseVersionFolder } from "../models/VersionFolder"
 import BemaniFolder, { parseBemaniFolder } from "../models/BemaniFolder"
 
+function between(n: number, a: number, b: number) {
+  return n >= a && n <= b
+}
+
 type EqualityOperator = "=" | "!="
 type NumericalOperator = "=" | "!=" | ">" | ">=" | "<" | "<="
 
 // Need to put longer tokens first or else:
 //   ">=" will get matched as ">" and "="
-//   "2a" will get matched as "2" and "a"
 //   etc.
 const TOKEN_REGEX =
-  /(!=|>=|<=|=|>|<|0?(1|2)(a|b)|\d{1,2}[emh]|(cs|\d{2})+|[+-]?[a-z]+|[+-\d.]+)/g
+  /(!=|>=|<=|=|>|<|\d{1,2}[emh]|(cs|\d{2})+|[+-]?[a-z]+|[+-\d.]+)/g
 
 abstract class Condition {
   static fromString(condStr: string): Condition {
@@ -105,11 +104,7 @@ class LevelCondition extends Condition {
   }
 
   private static isValidValue(value: string) {
-    return /\d{1,2}/.test(value) && this.between(Number(value), 1, 50)
-  }
-
-  private static between(n: number, a: number, b: number) {
-    return n >= a && n <= b
+    return /\d{1,2}/.test(value) && between(Number(value), 1, 50)
   }
 
   type = "level"
@@ -178,11 +173,7 @@ class LevelEmhCondition extends Condition {
 
   private static isValidValue(value: string) {
     const lv = value.split(/[emh]/)[0]
-    return /\d{1,2}/.test(lv) && this.between(Number(lv), 1, 50)
-  }
-
-  private static between(n: number, a: number, b: number) {
-    return n >= a && n <= b
+    return /\d{1,2}/.test(lv) && between(Number(lv), 1, 50)
   }
 
   private static levelEquals(
@@ -365,7 +356,7 @@ class RatingCondition extends Condition {
 }
 
 /**
- * srlv = 1a
+ * srlv = 1
  */
 class SranLevelCondition extends Condition {
   static isValid(
@@ -392,18 +383,18 @@ class SranLevelCondition extends Condition {
   }
 
   private static isValidValue(value: string) {
-    return isValidSranLevel(value)
+    return /\d{1,2}/.test(value) && between(Number(value), 1, 19)
   }
 
   type = "sranlevel"
 
   readonly operator: NumericalOperator
-  readonly value: SranLevel
+  readonly value: number
 
   constructor(operator: NumericalOperator, value: string) {
     super()
     this.operator = operator
-    this.value = parseSranLevel(value)
+    this.value = Number(value)
   }
 
   isSatisfiedByChart(chart: Chart): boolean {

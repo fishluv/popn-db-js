@@ -6,6 +6,7 @@ export default class Chart {
   readonly songId: number
   readonly difficulty: Difficulty
   readonly level: number
+  readonly hardest: boolean
   readonly bpm: string
   readonly mainBpm: number
   readonly bpmType: string
@@ -17,7 +18,7 @@ export default class Chart {
   readonly timingSteps: number[][]
   readonly jkwikiPath: string | null
   readonly rating: string | null
-  readonly sranLevel: string | null
+  readonly sranLevel: number | null
   readonly title: string
   readonly fwTitle: string
   readonly rTitle: string
@@ -37,6 +38,7 @@ export default class Chart {
     sid,
     diff,
     lv,
+    hardest,
     bpm: { disp, steps: bpmSteps, main, type: bpmType },
     dur,
     notes,
@@ -62,6 +64,8 @@ export default class Chart {
       throw new Error(`chart ${id} missing sid`)
     if (!diff) throw new Error(`chart ${id} missing diff`)
     if (!lv) throw new Error(`chart ${id} missing lv`)
+    if (hardest === undefined || hardest === null)
+      throw new Error(`chart ${id} missing hardest`)
     if (!disp) throw new Error(`chart ${id} missing disp`)
     if (!bpmSteps) throw new Error(`chart ${id} missing bpmSteps`)
     if (!main) throw new Error(`chart ${id} missing main`)
@@ -90,6 +94,7 @@ export default class Chart {
     this.songId = sid
     this.difficulty = parseDifficulty(diff)
     this.level = lv
+    this.hardest = hardest
     this.bpm = disp
     this.bpmSteps = bpmSteps
     this.mainBpm = main
