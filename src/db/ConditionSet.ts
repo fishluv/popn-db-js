@@ -1,6 +1,5 @@
 import Difficulty, { parseDifficulty } from "../models/Difficulty"
 import hasBuggedBpm from "./hasBuggedBpm"
-import isHardestDifficultyForSong from "./isHardestDifficultyForSong"
 import Chart from "../models/Chart"
 import VersionFolder, { parseVersionFolder } from "../models/VersionFolder"
 import BemaniFolder, { parseBemaniFolder } from "../models/BemaniFolder"
@@ -543,17 +542,9 @@ export class IdentifierCondition extends Condition {
       case "-soflan":
         return chart.bpmSteps.length === 1
       case "hardest":
-        return isHardestDifficultyForSong(
-          parseDifficulty(chart.difficulty),
-          chart.songId,
-          allCharts,
-        )
+        return chart.hardest
       case "-hardest":
-        return !isHardestDifficultyForSong(
-          parseDifficulty(chart.difficulty),
-          chart.songId,
-          allCharts,
-        )
+        return !chart.hardest
       case "holds":
         return chart.holdNotes > 0
       case "-holds":
