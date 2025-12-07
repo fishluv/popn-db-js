@@ -3,8 +3,8 @@ import ConditionSet, { IdentifierCondition } from "./ConditionSet"
 
 const UNILAB_0731_CHARTS: Array<Chart> =
   require("../../assets/2024073100.json").map((raw: RawChart) => new Chart(raw))
-const JAMFIZZ_0925_CHARTS: Array<Chart> =
-  require("../../assets/2024092500.with_extras.json").map(
+const JAMFIZZ_0603_CHARTS: Array<Chart> =
+  require("../../assets/2025060300.with_extras.json").map(
     (raw: RawChart) => new Chart(raw),
   )
 
@@ -123,4 +123,4 @@ class Database {
 }
 
 export const Unilab0731 = new Database(UNILAB_0731_CHARTS)
-export const JamFizz0925 = new Database(JAMFIZZ_0925_CHARTS)
+export const JamFizz0603 = new Database(JAMFIZZ_0603_CHARTS)

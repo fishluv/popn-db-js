@@ -5,7 +5,7 @@ Javascript client for [popn-dbs](https://github.com/fishluv/popn-dbs).
 Supported datecodes:
 
 - 2024073100 (Unilab)
-- 2024092500 (Jam&Fizz + extras)
+- 2025060300 (Jam&Fizz + extras)
 
 ## Development
 
@@ -31,12 +31,12 @@ yarn publish
 
 ```js
 // import
-import { JamFizz0925 } from "popn-db-js"
-JamFizz0925.sampleQueriedCharts({ count: 5, query: "folder=27,lv=45" })
+import { JamFizz0603 } from "popn-db-js"
+JamFizz0603.sampleQueriedCharts({ count: 5, query: "folder=27,lv=45" })
 
 // require
 var PopnDb = require("popn-db-js")
-PopnDb.JamFizz0925.sampleQueriedCharts({ count: 5, query: "folder=27,lv=45" })
+PopnDb.JamFizz0603.sampleQueriedCharts({ count: 5, query: "folder=27,lv=45" })
 
 // output
 [
