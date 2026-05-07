@@ -1,12 +1,14 @@
 import Chart from "../models/Chart"
 import ConditionSet, { IdentifierCondition } from "./ConditionSet"
+import * as UNILAB_0731_RAW from "../../assets/2024073100.json"
+import * as JAMFIZZ_0924_RAW from "../../assets/2025092400.with_extras.json"
 
-const UNILAB_0731_CHARTS: Array<Chart> =
-  require("../../assets/2024073100.json").map((raw: RawChart) => new Chart(raw))
-const JAMFIZZ_0924_CHARTS: Array<Chart> =
-  require("../../assets/2025092400.with_extras.json").map(
-    (raw: RawChart) => new Chart(raw),
-  )
+const UNILAB_0731_CHARTS: Array<Chart> = (UNILAB_0731_RAW as RawChart[]).map(
+  raw => new Chart(raw),
+)
+const JAMFIZZ_0924_CHARTS: Array<Chart> = (
+  JAMFIZZ_0924_RAW as RawChart[]
+).map(raw => new Chart(raw))
 
 export interface RawChart {
   id: string
@@ -109,12 +111,10 @@ class Database {
     query,
   }: { count?: number; query?: string } = {}): Chart[] => {
     if (!(count && count > 0)) {
-      console.error("`count` must be a positive integer")
-      return []
+      throw new Error("`count` must be a positive integer")
     }
     if (!query) {
-      console.error("`query` must be a nonempty string")
-      return []
+      throw new Error("`query` must be a nonempty string")
     }
 
     const queried = this.queryCharts(query)
