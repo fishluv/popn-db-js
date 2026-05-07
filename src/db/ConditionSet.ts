@@ -483,8 +483,10 @@ type Identifier =
   | "upper"
   | "ura"
   | "eemall"
-  | "omnimix"
-  | "lively"
+  | "unlock" // High Cheers only
+  | "naremoval" // High Cheers only
+  | "omnimix" // Extras only
+  | "lively" // Extras only
 type IdentifierConditionValue = Identifier | `+${Identifier}` | `-${Identifier}`
 
 /**
@@ -513,6 +515,8 @@ export class IdentifierCondition extends Condition {
       "upper",
       "ura",
       "eemall",
+      "unlock",
+      "naremoval",
       "omnimix",
       "lively",
     ]
@@ -565,6 +569,14 @@ export class IdentifierCondition extends Condition {
         return chart.debut === "eemall"
       case "-eemall":
         return chart.debut !== "eemall"
+      case "unlock":
+        return chart.songLabels.includes("unlock")
+      case "-unlock":
+        return !chart.songLabels.includes("unlock")
+      case "naremoval":
+        return chart.songLabels.includes("na_removal")
+      case "-naremoval":
+        return !chart.songLabels.includes("na_removal")
       case "omnimix":
         return chart.songLabels.includes("omnimix")
       case "-omnimix":
