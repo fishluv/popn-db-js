@@ -532,23 +532,23 @@ export class IdentifierCondition extends Condition {
   isSatisfiedByChart(chart: Chart, allCharts: Array<Chart>): boolean {
     switch (this.value) {
       case "buggedbpm":
-        return hasBuggedBpm(chart.bpmSteps)
+        return chart.bpmSteps !== null && hasBuggedBpm(chart.bpmSteps)
       case "-buggedbpm":
-        return !hasBuggedBpm(chart.bpmSteps)
+        return chart.bpmSteps !== null && !hasBuggedBpm(chart.bpmSteps)
       case "bpmchanges":
       case "soflan":
-        return chart.bpmSteps.length > 1
+        return chart.bpmSteps !== null && chart.bpmSteps.length > 1
       case "-bpmchanges":
       case "-soflan":
-        return chart.bpmSteps.length === 1
+        return chart.bpmSteps !== null && chart.bpmSteps.length === 1
       case "hardest":
         return chart.hardest
       case "-hardest":
         return !chart.hardest
       case "holds":
-        return chart.holdNotes > 0
+        return chart.holdNotes !== null && chart.holdNotes > 0
       case "-holds":
-        return chart.holdNotes === 0
+        return chart.holdNotes !== null && chart.holdNotes === 0
       case "floorinfection":
         return chart.songLabels.includes("floor_infection")
       case "-floorinfection":

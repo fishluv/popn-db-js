@@ -2,12 +2,16 @@ import Chart from "../models/Chart"
 import ConditionSet, { IdentifierCondition } from "./ConditionSet"
 import * as UNILAB_0731_RAW from "../../assets/2024073100.json"
 import * as JAMFIZZ_0924_RAW from "../../assets/2025092400.with_extras.json"
+import * as HIGHCHEERS_2605_RAW from "../../assets/hc.202605.json"
 
 const UNILAB_0731_CHARTS: Array<Chart> = (UNILAB_0731_RAW as RawChart[]).map(
   raw => new Chart(raw),
 )
 const JAMFIZZ_0924_CHARTS: Array<Chart> = (
   JAMFIZZ_0924_RAW as RawChart[]
+).map(raw => new Chart(raw))
+const HIGHCHEERS_2605_CHARTS: Array<Chart> = (
+  HIGHCHEERS_2605_RAW as RawChart[]
 ).map(raw => new Chart(raw))
 
 export interface RawChart {
@@ -18,16 +22,16 @@ export interface RawChart {
   hardest: boolean
   bpm: {
     disp: string
-    steps: number[]
-    main: number
-    type: string
+    steps: number[] | null
+    main: number | null
+    type: string | null
   }
-  dur: number
-  notes: number
-  holds: number
+  dur: number | null
+  notes: number | null
+  holds: number | null
   tim: {
-    steps: number[][]
-    type: string
+    steps: number[][] | null
+    type: string | null
   }
   jk: {
     path: string | null
@@ -45,7 +49,7 @@ export interface RawChart {
   debut: string
   folders: string[]
   slug: string
-  remyPath: string
+  remyPath: string | null
   labels: string[]
 }
 
@@ -124,3 +128,4 @@ class Database {
 
 export const Unilab0731 = new Database(UNILAB_0731_CHARTS)
 export const JamFizz0924 = new Database(JAMFIZZ_0924_CHARTS)
+export const HighCheers2605 = new Database(HIGHCHEERS_2605_CHARTS)
