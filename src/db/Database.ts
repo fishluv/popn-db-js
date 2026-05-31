@@ -7,9 +7,9 @@ import * as HIGHCHEERS_2605_RAW from "../../assets/hc.202605.json"
 const UNILAB_0731_CHARTS: Array<Chart> = (UNILAB_0731_RAW as RawChart[]).map(
   raw => new Chart(raw),
 )
-const JAMFIZZ_0924_CHARTS: Array<Chart> = (
-  JAMFIZZ_0924_RAW as RawChart[]
-).map(raw => new Chart(raw))
+const JAMFIZZ_0924_CHARTS: Array<Chart> = (JAMFIZZ_0924_RAW as RawChart[]).map(
+  raw => new Chart(raw),
+)
 const HIGHCHEERS_2605_CHARTS: Array<Chart> = (
   HIGHCHEERS_2605_RAW as RawChart[]
 ).map(raw => new Chart(raw))
@@ -67,6 +67,18 @@ function sampleArray<T>(arr: Array<T>, count: number) {
   return shuffled.slice(0, count)
 }
 
+// https://github.com/noahm/DDRCardDraw/blob/142e9a1097ef211f2c30748391e5b8b7f31e8591/src/utils/index.ts#L175C8-L184C2
+function pickRandomItem<T>(
+  list: Array<T>,
+): [idx: number, item: T] | [undefined, undefined] {
+  if (!list.length) {
+    return [undefined, undefined]
+  }
+  const idx = Math.floor(Math.random() * list.length)
+  const item = list[idx]
+  return [idx, item]
+}
+
 class Database {
   private readonly allCharts: Array<Chart>
 
@@ -113,7 +125,12 @@ class Database {
   sampleQueriedCharts = ({
     count,
     query,
-  }: { count?: number; query?: string } = {}): Chart[] => {
+    levelDistribution,
+  }: {
+    count?: number
+    query?: string
+    levelDistribution?: [number, number][]
+  } = {}): Chart[] => {
     if (!(count && count > 0)) {
       throw new Error("`count` must be a positive integer")
     }
@@ -122,7 +139,35 @@ class Database {
     }
 
     const queried = this.queryCharts(query)
-    return sampleArray(queried, count)
+    if (!levelDistribution) {
+      return sampleArray(queried, count)
+    } else {
+      // Example:
+      //    levelDistribution = [ [30, 1], [40, 3], [50, 1] ]
+      // => levelDrawPool = [30, 40, 40, 40, 50]
+      const levelDrawPool: number[] = levelDistribution.flatMap(
+        ([level, weight]) => Array(weight).fill(level),
+      )
+
+      const queriedByLevel = Object.groupBy(queried, chart => chart.level)
+
+      const drawnCharts: Chart[] = []
+      for (let i = 0; i < count; i++) {
+        const [, levelToDraw] = pickRandomItem(levelDrawPool)
+        if (levelToDraw === undefined) continue
+
+        const levelCharts = queriedByLevel[levelToDraw]
+        if (!levelCharts?.length) continue
+
+        const [idx, chart] = pickRandomItem(levelCharts)
+        if (idx === undefined) continue
+
+        levelCharts.splice(idx, 1)
+        drawnCharts.push(chart)
+      }
+
+      return drawnCharts
+    }
   }
 }
 

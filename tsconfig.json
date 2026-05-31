@@ -3,7 +3,7 @@
   "compilerOptions": {
     "rootDir": "src",
     "outDir": "build",
-    "lib": ["es2019"],
+    "lib": ["esnext"],
     "resolveJsonModule": true,
     "skipLibCheck": true
   },
