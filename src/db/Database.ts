@@ -134,9 +134,6 @@ class Database {
     if (!(count && count > 0)) {
       throw new Error("`count` must be a positive integer")
     }
-    if (!query) {
-      throw new Error("`query` must be a nonempty string")
-    }
 
     const queried = this.queryCharts(query)
     if (!levelDistribution) {

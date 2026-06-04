@@ -644,7 +644,7 @@ class FolderCondition extends Condition {
 
 export default class ConditionSet {
   static fromQuery = (query: string): ConditionSet => {
-    const conditions = query.split(/,/).map(condStr => {
+    const conditions = query.split(/,/).filter(Boolean).map(condStr => {
       return Condition.fromString(condStr)
     })
     return new ConditionSet(conditions)
