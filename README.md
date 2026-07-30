@@ -6,7 +6,7 @@ Supported datecodes:
 
 - Unilab 2024073100
 - Jam&Fizz 2025092400 + extras
-- High Cheers 202605\_\_\_\_
+- High Cheers 202607\_\_\_\_
 
 ## Development
 
@@ -32,46 +32,46 @@ yarn publish
 
 ```js
 // import
-import { HighCheers2605 } from "popn-db-js"
-HighCheers2605.sampleQueriedCharts({ count: 5, query: "folder=27,lv=45" })
+import { HighCheers2607 } from "popn-db-js"
+HighCheers2607.sampleQueriedCharts({ count: 5, query: "folder=28,lv=45" })
 
 // require
 var PopnDb = require("popn-db-js")
-PopnDb.HighCheers2605.sampleQueriedCharts({ count: 5, query: "folder=27,lv=45" })
+PopnDb.HighCheers2607.sampleQueriedCharts({ count: 5, query: "folder=28,lv=45" })
 
 // output
 [
   Chart {
-    id: '2042ex',
-    songId: 2042,
+    id: '2221ex',
+    songId: 2221,
     difficulty: 'ex',
     level: 45,
     hardest: true,
-    bpm: '143',
-    mainBpm: 143,
+    bpm: '185',
+    mainBpm: 185,
     bpmType: 'constant',
-    bpmSteps: [ 143 ],
-    duration: 98,
-    notes: 1030,
-    holdNotes: 35,
+    bpmSteps: [ 185 ],
+    duration: 125,
+    notes: 1190,
+    holdNotes: 32,
     timing: 'standard',
     timingSteps: [ [Array] ],
-    jkwikiPath: 'only_my_railgun_upper_ex',
-    rating: '0.0',
-    sranLevel: 4,
-    title: 'only my railgun',
-    fwTitle: 'ＯＮＬＹ　ＭＹ　ＲＡＩＬＧＵＮ',
-    rTitle: 'Only my railgun',
-    genre: 'only my railgun',
-    fwGenre: 'ＯＮＬＹ　ＭＹ　ＲＡＩＬＧＵＮ（アッパー）',
-    rGenre: 'Only my railgun',
-    artist: '♪♪♪♪♪',
-    rChara: 'SUMIRE',
-    debut: '27',
-    folders: [ '27', 'ddr', 'jubeat' ],
-    slug: 'only-my-railgun-upper',
-    remywikiPath: 'Only_my_railgun',
-    songLabels: [ 'upper' ]
+    jkwikiPath: '%E3%83%A1%E3%82%BA%E3%83%9E%E3%83%A9%E3%82%A4%E3%82%B6%E3%83%BC_ex',
+    rating: '-0.441',
+    sranLevel: null,
+    title: 'メズマライザー',
+    fwTitle: 'メズマライザー',
+    rTitle: 'Mesmerizer',
+    genre: 'メズマライザー',
+    fwGenre: 'メズマライザー',
+    rGenre: 'Mesmerizer',
+    artist: 'サツキ feat.初音ミク・重音テト',
+    rChara: '*うさぬこ*',
+    debut: '28',
+    folders: [ '28', 'iidx', 'ddr', 'jubeat', 'sdvx' ],
+    slug: 'mesmerizer',
+    remywikiPath: 'Mesmerizer',
+    songLabels: [ 'na_removal' ]
   },
   ...
 ]

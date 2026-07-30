@@ -4,4 +4,4 @@ import VersionFolder from "./models/VersionFolder"
 
 export { Chart, VersionFolder, BemaniFolder }
 
-export { Unilab0731, JamFizz0924, HighCheers2605 } from "./db/Database"
+export { Unilab0731, JamFizz0924, HighCheers2607 } from "./db/Database"
