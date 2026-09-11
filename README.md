@@ -6,7 +6,7 @@ Supported datecodes:
 
 - Unilab 2024073100
 - Jam&Fizz 2025092400 + extras
-- High Cheers 202607\_\_\_\_
+- High Cheers 202609\_\_\_\_
 
 ## Development
 
@@ -32,12 +32,12 @@ yarn publish
 
 ```js
 // import
-import { HighCheers2607 } from "popn-db-js"
-HighCheers2607.sampleQueriedCharts({ count: 5, query: "folder=28,lv=45" })
+import { HighCheers2609 } from "popn-db-js"
+HighCheers2609.sampleQueriedCharts({ count: 5, query: "folder=29,lv=45" })
 
 // require
 var PopnDb = require("popn-db-js")
-PopnDb.HighCheers2607.sampleQueriedCharts({ count: 5, query: "folder=28,lv=45" })
+PopnDb.HighCheers2609.sampleQueriedCharts({ count: 5, query: "folder=29,lv=45" })
 
 // output
 [
