@@ -2,5 +2,6 @@ node_modules/
 build/
 tsconfig.tsbuildinfo
 
+CLAUDE.md
 .DS_Store
 .vscode/
