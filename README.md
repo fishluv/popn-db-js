@@ -1,6 +1,6 @@
 # popn-db-js
 
-Javascript client for [popn-dbs](https://github.com/fishluv/popn-dbs).
+JS client for **[popn-dbs](https://github.com/fishluv/popn-dbs)**. Used by the Pop'n Tools randomizer app (**[popn-tools](https://github.com/fishluv/popn-tools)**).
 
 Supported datecodes:
 
